@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<chardata>
+	<setup>
+		<starting_tile>256</starting_tile>
+	</setup>
+
+	<scrl id="error">
+		<file>gfx\error.png</file>
+	</scrl>
+
+	<scrl id="map">
+		<file>gfx\map.png</file>
+	</scrl>
+
+	<scrl id="meta">
+		<file>gfx\meta.png</file>
+	</scrl>
+
+	<scrl id="dovbg">
+		<file>gfx\devicebg2.png</file>
+	</scrl>
+	<scrl id="dov">
+		<file>gfx\deviceover2.png</file>
+	</scrl>
+	<scrl id="kaverit">
+		<file>gfx\kaverit.png</file>
+	</scrl>
+
+	<scrl id="cherries">
+		<file>gfx\cherries.png</file>
+	</scrl>
+
+	<scrl id="cherries_a">
+		<file>gfx\cherries_a.png</file>
+	</scrl>
+	<scrl id="cherries_b">
+		<file>gfx\cherries_b.png</file>
+	</scrl>
+	<scrl id="textbox">
+		<file>gfx\textbox.png</file>
+	</scrl>
+	<scrl id="bs">
+		<file>gfx\bs.png</file>
+	</scrl>
+	<scrl id="kiss">
+		<file>gfx\kiss.png</file>
+	</scrl>
+
+	<scrl id="credits1">
+		<file>gfx\credits1.png</file>
+	</scrl>
+
+	<scrl id="credits2">
+		<file>gfx\credits2.png</file>
+	</scrl>
+
+	<scrl id="ffbg_a">
+		<file>gfx\ffbg_a.png</file>
+	</scrl>
+
+	<scrl id="ffbg_b">
+		<file>gfx\ffbg_b0.png</file>
+		<auto1>gfx\ffbg_b1.png</auto1>
+		<auto2>gfx\ffbg_b2.png</auto2>
+		<auto3>gfx\ffbg_b3.png</auto3>
+	</scrl>
+
+	<pict id="ffbg_c">
+		<file>gfx\ffbg_c.png</file>
+	</pict>
+	
+	<scrl id="ttbg_a">
+		<file>gfx\ttbg_a.png</file>
+	</scrl>
+
+	<scrl id="ttbg_b">
+		<file>gfx\ttbg_b.png</file>
+	</scrl>
+
+	<scrl id="ttbg_c">
+		<file>gfx\ttbg_c.png</file>
+	</scrl>
+
+	<pict id="topleft">
+		<file>gfx\topleft.png</file>
+		<flips>xyz</flips>
+	</pict>
+
+	<pict id="pointer">
+		<file>gfx\pointer.png</file>
+	</pict>
+	
+	<pict id="gradient">
+		<file>gfx\colorbars.png</file>
+	</pict>
+	
+	<pict id="tf4layers">
+		<file>gfx\tf4layers.png</file>
+	</pict>
+
+</chardata>
