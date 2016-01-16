@@ -50,3 +50,8 @@ extern paletteInfo gradient_Palettes;
 extern pictureInfo tf4layers;
 extern paletteInfo tf4layers_Palettes;
 
+//animated sprites
+extern spriteInfo bmary_spr;
+extern paletteInfo bmary_spr_Palettes;
+#include "gfx/bmary_spr/bmary_spr.h"
+

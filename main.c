@@ -151,7 +151,6 @@ else {
 
 	while(1) {
 		// BIOSF_SYSTEM_IO
-		asm("jsr 0xC0044A");
 		//cur = animList[(tableShift/4) % 11];
 		//curpal = palList[(tableShift/4) % 11];
 		waitVBlank();
@@ -370,7 +369,6 @@ void demopart_phone() {
 
 	while(1) {
 		// BIOSF_SYSTEM_IO
-		asm("jsr 0xC0044A");
 
 		waitVBlank();
 		if (t>840) break;
@@ -508,12 +506,13 @@ void demopart_sakura() {
 	picture dovrot;
 	pictureInfo* cur;
 	paletteInfo* curpal;
-		const char *text[5];
-	text[0] = " <NARRATOR>                           ";
-	text[1] = "  ";
-	text[2] = " Here's where I've always hidden away ";
-	text[3] = " when my mind needs true tranquility, ";
-	text[4] = " peace, and quiet... my Zen garden... ";
+		const char *text[6];
+	text[0] = " <NARRATOR>                ";
+	text[1] = " ";
+	text[2] = " ";
+	text[3] = " Here's where I've always hidden away ";
+	text[4] = " when my mind needs true tranquility, ";
+	text[5] = " peace, and quiet... my Zen garden... ";
 
 	backgroundColor(0x0000); //BG color
 	LSPCmode=0x1c00;	//autoanim speed
@@ -552,7 +551,6 @@ void demopart_sakura() {
 
  	while(1) {
 		// BIOSF_SYSTEM_IO
-		asm("jsr 0xC0044A");
 
 		waitVBlank();
 /*
@@ -591,10 +589,10 @@ void demopart_sakura() {
 		}
 		if (scrolly >= 200 << SHIFT_AMOUNT) scrollx = ((scrolly-(200 << SHIFT_AMOUNT)) >> SHIFT_AMOUNT+5);
 		if (scrollx > 20) scrollx = 20;
-//		scrollerSetPos(&layerfg1Scroll,-32-scrollx,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
-//		scrollerSetPos(&layerfg2Scroll,48+scrollx*0.5,50+(scrolly*3 >> (SHIFT_AMOUNT+2)));
-		scrollerSetPos(&layerfg1Scroll,-32,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
-		scrollerSetPos(&layerfg2Scroll,0,50+(scrolly*3 >> (SHIFT_AMOUNT+2)));
+		scrollerSetPos(&layerfg1Scroll,-32-scrollx,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
+		scrollerSetPos(&layerfg2Scroll,48+scrollx*0.5,50+(scrolly*3 >> (SHIFT_AMOUNT+2)));
+//		scrollerSetPos(&layerfg1Scroll,-32,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
+//		scrollerSetPos(&layerfg2Scroll,0,50+(scrolly*3 >> (SHIFT_AMOUNT+2)));
 
 
 //		if (t > 30 && t < 330*2) scrollerSetPos(&layerbgScroll,0,(t-30)/2);
@@ -606,11 +604,11 @@ void demopart_sakura() {
 		scrollerSetPos(&textboxScroll,0,-218+((t-600)));
 
 		if (t >= 680) {
-				if (tl < 5) {
+				if (tl < 6) {
 					if (text[tl][lt] != '0') fixPrintf(tox+lt+1,toy+tl*1+ee,0,0,"%c",text[tl][lt]);
 					lt2++;
 					if (lt2>1) {lt++; lt2=0;}
-					if (tl<5) { 
+					if (tl<6) { 
 						if (lt >= strlen(text[tl])) { lt = 0; tl++;  }
 					}
 				}
@@ -704,7 +702,6 @@ void demopart_meta() {
 
 	while(1) {
 		// BIOSF_SYSTEM_IO
-		asm("jsr 0xC0044A");
 
 		waitVBlank();
 		if (t>1450) break;
@@ -847,7 +844,6 @@ void demopart_kiss() {
 
 	while(1) {
 		// BIOSF_SYSTEM_IO
-		asm("jsr 0xC0044A");
 
 		waitVBlank();
 		if (t>1840) break;
@@ -1075,46 +1071,35 @@ void sortSprites(aSprite *list[], int count) {
 #define POOL_MODE
 #define LOTS
 
-/*
-void aSpriteDemo() {
+void demopart_sprite() {
 	int x=87;
 	int y=136;
+	int i=0;
+	int t =0;
+	int t3=0;
 	int relX,relY;
 	short showdebug=false;
-	aSprite demoSpr,demoSpr2,demoSpr3;
-	#ifdef POOL_MODE
+
 	spritePool testPool;
-	uint *drawTable[16];
+	uint *drawTable[16+(6*6)+100];
 	uint *drawTablePtr;
 	int sortSize;
-		#ifdef LOTS
-		aSprite demoSpr4,demoSpr5,demoSpr6,demoSpr7,demoSpr8,demoSpr9,demoSprA;
-		#endif
-	#endif
+	aSprite sprites[6*6];
 	picture ptr,tleft,bright;
 	short way1=JOY_UP,way2=JOY_UP;
 	short visible=true;
-
 
 	clearFixLayer();
 	backgroundColor(0x7bbb); //BG color
 	initGfx();
 	jobMeterSetup(true);
 
-	aSpriteInit(&demoSpr,&bmary_spr,1,16,x,y,0,FLIP_NONE);
-	aSpriteInit(&demoSpr2,&bmary_spr,5,16,160-16,y,0,FLIP_NONE);
-	aSpriteInit(&demoSpr3,&bmary_spr,9,16,160+16,y,0,FLIP_NONE);
-	#ifdef POOL_MODE
-	#ifdef LOTS
-	aSpriteInit(&demoSpr4,&bmary_spr,9,16,160+32,146,0,FLIP_NONE);
-	aSpriteInit(&demoSpr5,&bmary_spr,9,16,160-32,156,0,FLIP_NONE);
-	aSpriteInit(&demoSpr6,&bmary_spr,9,16,160+48,166,0,FLIP_NONE);
-	aSpriteInit(&demoSpr7,&bmary_spr,9,16,160-48,176,0,FLIP_NONE);
-	aSpriteInit(&demoSpr8,&bmary_spr,9,16,160+10,186,0,FLIP_NONE);
-	aSpriteInit(&demoSpr9,&bmary_spr,9,16,160-10,196,0,FLIP_NONE);
-	aSpriteInit(&demoSprA,&bmary_spr,9,16,87,206,0,FLIP_NONE);
-	#endif
-	#endif
+	for (i = 0; i < 6*6; i++) {
+		y = i / 6;
+		x = 0;
+		if (y%2 == 1) x = 11;
+		aSpriteInit(&sprites[i],&bmary_spr,9,16,120+(i%6 *22)+x,120+y*6,i % 36,FLIP_NONE); 
+	}
 
 	palJobPut(16,bmary_spr_Palettes.palCount,&bmary_spr_Palettes.data);
 
@@ -1125,41 +1110,23 @@ void aSpriteDemo() {
 	pictureInit(&bright,&topleft,202,201,0,224,FLIP_XY);
 	palJobPut(201,topleft_Palettes.palCount,&topleft_Palettes.data);
 
-	fixPrint(2,3,0,0,"1P \x12\x13\x10\x11: move sprite");
-	fixPrint(2,4,0,0,"1P AB: set animation");
-	fixPrint(2,5,0,0,"1P C: toggle outline");
-	fixPrint(2,6,0,0,"2P ABCD: flip mode");
-
-	#ifdef POOL_MODE
-	spritePoolInit(&testPool,10,80);	//54 100
+	spritePoolInit(&testPool,200,80);	//54 100
 	drawTablePtr=(int*)drawTable;
 	*drawTablePtr++=0;
-	*drawTablePtr++=(uint)&demoSpr;
-	*drawTablePtr++=(uint)&demoSpr2;
-	*drawTablePtr++=(uint)&demoSpr3;
-	sortSize=3;
-		#ifdef LOTS
-		*drawTablePtr++=(uint)&demoSpr4;
-		*drawTablePtr++=(uint)&demoSpr5;
-		*drawTablePtr++=(uint)&demoSpr6;
-		*drawTablePtr++=(uint)&demoSpr7;
-		*drawTablePtr++=(uint)&demoSpr8;
-		*drawTablePtr++=(uint)&demoSpr9;
-		*drawTablePtr++=(uint)&demoSprA;
-		sortSize=10;
-		#endif
+		for (i = 0; i < 6*6; i++) {
+			*drawTablePtr++=(uint)&sprites[i];
+		}
+		sortSize=(6*6);
 	*drawTablePtr=0;
 
-	sortSprites((aSprite*)&drawTable[1],sortSize);
+	//sortSprites((aSprite*)&drawTable[1],sortSize);
 	spritePoolDrawList(&testPool,&drawTable[1]);
 	spritePoolClose(&testPool);
-	#else
-	aSpriteAnimate(&demoSpr);
-	aSpriteAnimate(&demoSpr2);
-	aSpriteAnimate(&demoSpr3);
-	#endif
 
 	SCClose();
+
+	startframe = DAT_frameCounter+1;
+
 	while(1) {
 		waitVBlank();
 
@@ -1182,87 +1149,30 @@ void aSpriteDemo() {
 		if(p1&JOY_RIGHT)	x++;
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-		jobMeterColor(JOB_BLUE);
+//		jobMeterColor(JOB_BLUE);
 
-		if(p1e&JOY_A)	aSpriteSetAnim(&demoSpr,BMARY_SPR_ANIM_IDLE);
-		if(p1e&JOY_B)	aSpriteSetAnim(&demoSpr,BMARY_SPR_ANIM_WALK);
-		if(p1e&JOY_C) {
-			if(showdebug) {
-				//move debug stuff offscreen
-				pictureSetPos(&ptr,0,224);
-				pictureSetPos(&tleft,0,224);
-				pictureSetPos(&bright,0,224);
-			}
-			showdebug^=1;
-		}
-		if(p2&JOY_A)	aSpriteSetFlip(&demoSpr,FLIP_NONE);
-		if(p2&JOY_B)	aSpriteSetFlip(&demoSpr,FLIP_X);
-		if(p2&JOY_C)	aSpriteSetFlip(&demoSpr,FLIP_Y);
-		if(p2&JOY_D)	aSpriteSetFlip(&demoSpr,FLIP_XY);
-
-		aSpriteSetPos(&demoSpr,x,y);
-
-		if(way1==JOY_UP) {
-			aSpriteMove(&demoSpr2,0,2);
-			if(demoSpr2.posY>220) way1=JOY_DOWN;
-		} else {
-			aSpriteMove(&demoSpr2,0,-2);
-			if(demoSpr2.posY<90) way1=JOY_UP;
-		}
-		if(way2==JOY_UP) {
-			aSpriteMove(&demoSpr3,0,1);
-			if(demoSpr3.posY>220) way2=JOY_DOWN;
-		} else {
-			aSpriteMove(&demoSpr3,0,-1);
-			if(demoSpr3.posY<90) way2=JOY_UP;
-		}
-
-		if(p1e&JOY_D) {
-			if(visible) {
-				aSpriteHide(&demoSpr);
-				#ifndef POOL_MODE
-				clearSprites(demoSpr.baseSprite,demoSpr.tileWidth);
-				#endif
-			} else {
-				aSpriteShow(&demoSpr);
-			}
-			visible^=1;
-		}
-
-		#ifdef POOL_MODE
 		//while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-		sortSprites(&drawTable[1],sortSize);
-		jobMeterColor(JOB_PINK);
+//		sortSprites(&drawTable[1],sortSize);
+//		jobMeterColor(JOB_PINK);
+
+		for (i = 0; i < 6*6; i++) {
+			aSpriteSetPos(&sprites[i],50+(sintab[i*16+t&1023]),i*3+(120+(sintab[i*8+(t+256)&1023]>>4)));
+		}
+
 		if(testPool.way==WAY_UP)
 				spritePoolDrawList(&testPool,&drawTable[1]);
 		else	spritePoolDrawList(&testPool,drawTablePtr);
-		#else
-		aSpriteAnimate(&demoSpr);
-		aSpriteAnimate(&demoSpr2);
-		aSpriteAnimate(&demoSpr3);
-		#endif
 
-		//aSprite debug info
-		if(showdebug) {
-			jobMeterColor(JOB_BLACK);
-			pictureSetPos(&ptr,x,y);
-			if(demoSpr.currentFlip&0x0001) relX=x-((demoSpr.currentFrame->tileWidth<<4)+demoSpr.currentStep->shiftX);
-				else relX=x+demoSpr.currentStep->shiftX;
-			if(demoSpr.currentFlip&0x0002) relY=y-((demoSpr.currentFrame->tileHeight<<4)+demoSpr.currentStep->shiftY);
-				else relY=y+demoSpr.currentStep->shiftY;
-			pictureSetPos(&tleft,relX,relY);
-			pictureSetPos(&bright,relX+((demoSpr.currentFrame->tileWidth-1)<<4),relY+((demoSpr.currentFrame->tileHeight-1)<<4));
-		}
-
-		jobMeterColor(JOB_GREEN);
-		#ifdef POOL_MODE
 		spritePoolClose(&testPool);
-		#endif
-		jobMeterColor(JOB_GREEN);
+
+		t3 = DAT_frameCounter-startframe;
+
+		millis = t3/(1); 
+		t = millis;
+
 		SCClose();
 	}
 }
-*/
 
 /*
 void pictureDemo() {
@@ -1561,15 +1471,27 @@ void tempTests() {
 
 
 void startDemologic() {
+	int i = 0;
+
 	// call cdda, start playing track 2
-	asm("move.w #0x0002,%d0");
+
+	asm("clr.w %d0");
+	asm("move.w #0x0502,%d0");
 	asm("jsr 0xC0056A");
 
+	demopart_sprite();
+
 	demopart_letter();
+
 	demopart_phone();
+
 	demopart_sakura();
+
+
 	demopart_meta();
+
 	demopart_kiss();
+
 	texto = 1;
 	demopart_letter();
 
@@ -1577,21 +1499,5 @@ void startDemologic() {
 
 
 int main(void) {
-	//volMEMBYTE(0x10fd80)=0x80;
-	
-	int i;
-
-	for (i = 0; i < 4096*50; i++) { i++; } 
-
-		clearFixLayer();
-
-		waitVBlank();
-//		if(setup4P())
-//			fixPrintf(8,20,0,0,"4P! :)");
-//		else fixPrintf(8,20,0,0,"no 4P :(");
-
-		initGfx();
-		backgroundColor(0x7bbb); //BG color
-
 		startDemologic();		
 }
