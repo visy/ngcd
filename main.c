@@ -194,6 +194,14 @@ else {
 			break;
 		}
 
+		if (millis > 800 && texto == 1) {
+			clearSprites(0, 512);
+			SCClose();
+			waitVBlank();
+
+			break;
+		}
+
 		x=((t*1)%400);
 
 		if (t >= 50) t3 = t-50;
@@ -475,9 +483,12 @@ void demopart_sakura() {
 	int x2=0;
 	int y=70;
 	int t;
+	int once = 0;
 		int tox = 0;
-	int toy = 22;
+	int toy = 24;
 	int lt = 0;
+	int xx=0;
+	int yy=0;
 	int lt2 = 0;
 	int tl = 0;
 	int ee = 0;
@@ -502,17 +513,17 @@ void demopart_sakura() {
 	scroller layerfg1Scroll;
 	scroller layerfg2Scroll;
 	scroller textboxScroll;
+	scroller animScroll;
 
 	picture dovrot;
 	pictureInfo* cur;
 	paletteInfo* curpal;
-		const char *text[6];
+		const char *text[5];
 	text[0] = " <NARRATOR>                ";
 	text[1] = " ";
-	text[2] = " ";
-	text[3] = " Here's where I've always hidden away ";
-	text[4] = " when my mind needs true tranquility, ";
-	text[5] = " peace, and quiet... my Zen garden... ";
+	text[2] = " Here's where I've always hidden away ";
+	text[3] = " when my mind needs true tranquility, ";
+	text[4] = " peace, and quiet... my Zen garden... ";
 
 	backgroundColor(0x0000); //BG color
 	LSPCmode=0x1c00;	//autoanim speed
@@ -531,8 +542,9 @@ void demopart_sakura() {
 	scrollerInit(&layerfg2Scroll, &cherries_a, 1+32+32, 16+16+16, 0,0);
 	palJobPut(16+16+16, cherries_a_Palettes.palCount, cherries_a_Palettes.data);
 
-	scrollerInit(&textboxScroll, &textbox, 1+32+32+32, 16+16+16+16, 0,-218);
-	palJobPut(16+16+16+16, textbox_Palettes.palCount, textbox_Palettes.data);
+	scrollerInit(&animScroll, &sakura, 1+32+32+32, 16+16+16+16, -32,0);
+	palJobPut(16+16+16+16, sakura_Palettes.palCount, sakura_Palettes.data);
+
 
 
 	volMEMWORD(0x400004)=0xffff; // white
@@ -576,6 +588,28 @@ void demopart_sakura() {
 
 		if (t > 900) break;
 
+		t2 = (DAT_frameCounter-startframe-yy)/2;
+		if (once !=2) once = 0;
+
+		if (t >400 && t < 559) {
+			once = 1;
+			yy++;
+			if (yy > 5) {
+			yy = 0;
+			xx++;
+			if (xx > 52) xx = 0;
+			scrollerSetPos(&animScroll, 0, xx*224);
+			}
+		}
+
+		if (once == 0 && t >= 559) {
+			once = 2;
+			clearSprites(1+32+32+32,100);
+			scrollerInit(&textboxScroll, &textbox, 1+32+32+32+32, 16+16+16+16+16, 0,-224);
+			palJobPut(16+16+16+16+16, textbox_Palettes.palCount, textbox_Palettes.data);
+
+		}
+
 		if (t > 0 && t < 330*2) { 
 			y=sintab[(t << SHIFT_AMOUNT) & 1023] << SHIFT_AMOUNT-7;
 			if (scrolly > 1200 << SHIFT_AMOUNT) { 
@@ -600,11 +634,11 @@ void demopart_sakura() {
 //		if (t > 30 && t < 488) scrollerSetPos(&layerfg2Scroll,48,(t*2-30)+40);
 
 
-		if (t > 600 && t < 680)
-		scrollerSetPos(&textboxScroll,0,-218+((t-600)));
+		if (t > 600 && t < 663)
+		scrollerSetPos(&textboxScroll,0,-224+((t-600)));
 
 		if (t >= 680) {
-				if (tl < 6) {
+				if (tl < 5) {
 					if (text[tl][lt] != '0') fixPrintf(tox+lt+1,toy+tl*1+ee,0,0,"%c",text[tl][lt]);
 					lt2++;
 					if (lt2>1) {lt++; lt2=0;}
@@ -846,6 +880,7 @@ void demopart_kiss() {
 		// BIOSF_SYSTEM_IO
 
 		waitVBlank();
+
 		if (t>1840) break;
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
@@ -891,7 +926,16 @@ void demopart_kiss() {
 			
 		jobMeterColor(JOB_BLUE);
 
+		for (i = 0; i < 10; i++) {
+
+		backgroundColor(0x77aa-(((t+i/2))>>5)); //BG color
+		}
+
+
+
+
 		SCClose();
+
 
 
 		jobMeterColor(JOB_GREEN);
@@ -1079,6 +1123,7 @@ void demopart_sprite() {
 	int t3=0;
 	int relX,relY;
 	short showdebug=false;
+	scroller frontScroll;
 
 	spritePool testPool;
 	uint *drawTable[16+(6*6)+100];
@@ -1090,25 +1135,19 @@ void demopart_sprite() {
 	short visible=true;
 
 	clearFixLayer();
-	backgroundColor(0x7bbb); //BG color
 	initGfx();
 	jobMeterSetup(true);
 
 	for (i = 0; i < 6*6; i++) {
-		y = i / 6;
 		x = 0;
 		if (y%2 == 1) x = 11;
-		aSpriteInit(&sprites[i],&bmary_spr,9,16,120+(i%6 *22)+x,120+y*6,i % 36,FLIP_NONE); 
+		aSpriteInit(&sprites[i],&bmary_spr,9,16,120+(i%6 *22)+x,120,i % 40,FLIP_NONE); 
 	}
 
 	palJobPut(16,bmary_spr_Palettes.palCount,&bmary_spr_Palettes.data);
 
-	pictureInit(&ptr,&pointer,200,200,0,224,FLIP_NONE);
-	palJobPut(200,pointer_Palettes.palCount,&pointer_Palettes.data);
-
-	pictureInit(&tleft,&topleft,201,201,0,224,FLIP_NONE);
-	pictureInit(&bright,&topleft,202,201,0,224,FLIP_XY);
-	palJobPut(201,topleft_Palettes.palCount,&topleft_Palettes.data);
+	scrollerInit(&frontScroll, &isobg, 1, 32, 0, 0);
+	palJobPut(32, isobg_Palettes.palCount, isobg_Palettes.data);
 
 	spritePoolInit(&testPool,200,80);	//54 100
 	drawTablePtr=(int*)drawTable;
@@ -1129,6 +1168,7 @@ void demopart_sprite() {
 
 	while(1) {
 		waitVBlank();
+	backgroundColor(0x0000+t*3); //BG color
 
 		p1=volMEMBYTE(P1_CURRENT);
 		p1e=volMEMBYTE(P1_EDGE);
@@ -1156,7 +1196,7 @@ void demopart_sprite() {
 //		jobMeterColor(JOB_PINK);
 
 		for (i = 0; i < 6*6; i++) {
-			aSpriteSetPos(&sprites[i],50+(sintab[i*16+t&1023]),i*3+(120+(sintab[i*8+(t+256)&1023]>>4)));
+			aSpriteSetPos(&sprites[i],(50+(sintab[i*15+t&1023]+sintab[i*5+t/2&1023]>>1)>>4)%15 * 21, i*5+(90+(sintab[i*8+(t+256)&1023]>>4)));
 		}
 
 		if(testPool.way==WAY_UP)
@@ -1167,10 +1207,14 @@ void demopart_sprite() {
 
 		t3 = DAT_frameCounter-startframe;
 
-		millis = t3/(1); 
+		millis = t3*(2); 
 		t = millis;
 
+		scrollerSetPos(&frontScroll, 0, 0);
+
 		SCClose();
+
+
 	}
 }
 
@@ -1479,8 +1523,6 @@ void startDemologic() {
 	asm("move.w #0x0502,%d0");
 	asm("jsr 0xC0056A");
 
-	demopart_sprite();
-
 	demopart_letter();
 
 	demopart_phone();
@@ -1493,7 +1535,11 @@ void startDemologic() {
 	demopart_kiss();
 
 	texto = 1;
+
 	demopart_letter();
+
+	demopart_sprite();
+
 
 }
 

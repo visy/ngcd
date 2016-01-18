@@ -55,6 +55,14 @@
 <frame>92,0:2,4</frame>
 <frame>94,0:2,4</frame>
 </sprt>
+
+  <scrl id="isobg">
+ 	<file>gfx\isobg.png</file>
+  </scrl>
+  <scrl id="sakura">
+ 	<file>gfx\sakura.png</file>
+  </scrl>
+
   <scrl id="error">
     <file>gfx\error.png</file>
   </scrl>

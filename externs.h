@@ -1,4 +1,8 @@
 //scrollers
+extern scrollerInfo isobg;
+extern paletteInfo isobg_Palettes;
+extern scrollerInfo sakura;
+extern paletteInfo sakura_Palettes;
 extern scrollerInfo error;
 extern paletteInfo error_Palettes;
 extern scrollerInfo map;
