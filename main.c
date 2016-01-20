@@ -425,7 +425,7 @@ void demopart_phone() {
 		// BIOSF_SYSTEM_IO
 
 		waitVBlank();
-		if (t>825) break;
+		if (t>820) break;
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
 		jobMeterColor(JOB_PURPLE);
@@ -496,7 +496,7 @@ void demopart_phone() {
 		if (t > 600) scrollerSetPos(&layer2Scroll, 0, lp2);
 		if (t > 850) scrollerSetPos(&layer2Scroll, 0, lp2+(850-t));
 
-		t2=00+millis;
+		t2=-20+millis;
 		if (t2 >= 464-260) t2=464-260;
 
 
