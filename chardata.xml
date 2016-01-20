@@ -114,6 +114,14 @@
     <auto2>gfx\ffbg_b2.png</auto2>
     <auto3>gfx\ffbg_b3.png</auto3>
   </scrl>
+
+  <scrl id="school">
+  	<file>gfx\school.png</file>
+  </scrl>
+  <scrl id="tree">
+  	<file>gfx\tree.png</file>
+  </scrl>
+
   <pict id="ffbg_c">
     <file>gfx\ffbg_c.png</file>
   </pict>
@@ -135,8 +143,5 @@
   </pict>
   <pict id="gradient">
     <file>gfx\colorbars.png</file>
-  </pict>
-  <pict id="tf4layers">
-    <file>gfx\tf4layers.png</file>
   </pict>
 </chardata>

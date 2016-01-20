@@ -52,8 +52,56 @@ const int sintab[1024] =
 
 };
 
+int trastart = 0;
+int traframe = 0;
+int targetframe = 1705;
+int firstframe = 1700;
+int traend = 0;
+int tradir = 0;
 
+void draw_transition() {
+	int t = DAT_frameCounter-trastart;
+	int i = 0;
+	int x;
+	int y;
+	int traframea;
+	if (traend == 2) return;
+	if (traend == 0) {
+		if (trastart == 0) trastart = DAT_frameCounter;
 
+		if (t >= firstframe && t <= targetframe && traframe == 0)  {
+			traframe++;
+			traframea = traframe;
+			if (tradir == 1) traframea = 16-traframe;
+			for (y = 0;y<30;y++) {
+					fixPrintf(0,y,0,0,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea);
+			}
+			targetframe = t + 1;
+		}
+		else if (t >= targetframe && traframe > 0)  {
+			traframe++; 
+			traframea = traframe;
+			if (tradir == 1) { traframea = 15-traframe; if (traframea == 0) traframea = 255;}
+			for (y = 0;y<30;y++) {
+					fixPrintf(0,y,0,0,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea);
+			}
+			targetframe = t + 1;
+		}
+		if (traframe == 15 && tradir == 0) traend = 1;
+		if (traframe == 16 && tradir == 1) traend = 2;
+	} else {
+		traframe++;
+		if (traframe > 60) {
+			traend = 0;
+			tradir = 1;
+			traframe = 0;
+			trastart = 0;
+			targetframe = 5;
+			firstframe = 1;
+		}
+	}
+
+}
 
 
 void demopart_letter() {
@@ -187,7 +235,7 @@ else {
 
 //		fixPrintf(2,3,0,0,"%d", millis);
 
-		if (millis > 900 && texto == 0) {
+		if (millis > 880 && texto == 0) {
 			clearSprites(0, 512);
 			SCClose();
 			waitVBlank();
@@ -242,6 +290,8 @@ else {
 		scrollerSetPos(&letterScroll, lx+8, ly);
 
 		SCClose();
+
+		draw_transition();
 /*
 		if(raster) {
 			TInextTable=(TInextTable==rasterData0)?rasterData1:rasterData0;
@@ -345,10 +395,8 @@ void demopart_phone() {
 	text[8+6] = "    and u must be.";
 	text[8+7] = "    ";
 
-	backgroundColor(0xffff); //BG color
 	LSPCmode=0x1c00;	//autoanim speed
 
-	clearFixLayer();
 	initGfx();
 	jobMeterSetup(true);
 
@@ -364,10 +412,6 @@ void demopart_phone() {
 	scrollerInit(&layerfrScroll, &dov, 262+1+42+42, 16+16+16+16, 0, 4);
 	palJobPut(16+16+16+16, dov_Palettes.palCount, dov_Palettes.data);
 
-
-	volMEMWORD(0x400004)=0xffff; // white
-	volMEMWORD(0x400002)=0xffff; // black
-
 	SCClose();
 
 	t = 0;
@@ -381,7 +425,7 @@ void demopart_phone() {
 		// BIOSF_SYSTEM_IO
 
 		waitVBlank();
-		if (t>840) break;
+		if (t>825) break;
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
 		jobMeterColor(JOB_PURPLE);
@@ -418,6 +462,9 @@ void demopart_phone() {
 		jobMeterColor(JOB_BLUE);
 
 			if (t >= 600 && t < 800 && ml < 15) { 
+				backgroundColor(0xffff);
+				volMEMWORD(0x400004)=0xffff; // white
+				volMEMWORD(0x400002)=0xffff; // black
 				ly = -15;
 				if (tl < 9) {
 					if (text[tl+offer][lt] == '1') { ml = 50; continue; }
@@ -449,12 +496,14 @@ void demopart_phone() {
 		if (t > 600) scrollerSetPos(&layer2Scroll, 0, lp2);
 		if (t > 850) scrollerSetPos(&layer2Scroll, 0, lp2+(850-t));
 
-		t2=-40+millis;
+		t2=00+millis;
 		if (t2 >= 464-260) t2=464-260;
 
 
 
 			SCClose();
+
+			draw_transition();
 
 
 		jobMeterColor(JOB_GREEN);
@@ -1112,7 +1161,6 @@ void demopart_sprite() {
 	short way1=JOY_UP,way2=JOY_UP;
 	short visible=true;
 
-	clearFixLayer();
 	initGfx();
 	jobMeterSetup(true);
 
@@ -1192,17 +1240,35 @@ void demopart_sprite() {
 
 		SCClose();
 
+				draw_transition();
+
+
 
 	}
 }
 
-/*
-void pictureDemo() {
-	int x=94+48;
-	int y=54;
-	picture testPict;
+
+void demopart_letter2() {
+		int x=FRONT_START_X;
+	int y=FRONT_START_Y;
+	int lx=0;
+	int ly=-190;
+	int scrollx=100;
+	int scrolly=30;
+	int tox = 7;
+	int toy = 12;
+	int lt = 0;
+	int lt2 = 0;
+	int tl = 0;
+	int ee = 0;
+	int backX;
+	int backY;
+	int t;
+	int t2;
+	int t3=0;
+	int fixed;
 	int i,j;
-	WORD raster=false;
+	WORD raster=true;
 	WORD tableShift=0;
 	ushort rasterData0[512];
 	ushort rasterData1[512];
@@ -1210,286 +1276,191 @@ void pictureDemo() {
 	ushort *dataPtr;
 	short displayedRasters;
 
+//	pictureInfo* animList[12] = { &spin1, &spin2, &spin3, &spin4, &spin5, &spin6, &spin7, &spin8, &spin9, &spin10, &spin11, &spin12 };
+//	paletteInfo* palList[12] = { &spin1_Palettes, &spin2_Palettes, &spin3_Palettes, &spin4_Palettes, &spin5_Palettes, &spin6_Palettes, &spin7_Palettes, &spin8_Palettes, &spin9_Palettes, &spin10_Palettes, &spin11_Palettes, &spin12_Palettes };
+
+	scroller backScroll, frontScroll, letterScroll;
+	picture scroll;
+
+	pictureInfo* cur;
+	paletteInfo* curpal;
+	const char *text[8];
+
+	text[0] = "   Anyway, I've      ";
+	text[1] = "learned to accept it ";
+	text[2] = "and the pain subsided.";
+	text[3] = "Felt like forever... ";
+	text[4] = " At least we'll have ";
+	text[5] = "the memories. Those..";
+	text[6] = " Those will never go ";
+	text[7] = "away. Will never die.";
+
+	backgroundColor(0xffff); //BG color
+	LSPCmode=0x1c00;	//autoanim speed
+
 	clearFixLayer();
-	backgroundColor(0x7bbb); //BG color
 	initGfx();
 	jobMeterSetup(true);
 
-	LSPCmode=0x1c00;
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
-	pictureInit(&testPict, &terrypict,1, 16, x, y,FLIP_NONE);
-	palJobPut(16,terrypict_Palettes.palCount,terrypict_Palettes.data);
+//	rasterAddr=0x8400+scroll.baseSprite;
 
-	rasterAddr=0x8400+testPict.baseSprite;
+	scrollerInit(&backScroll, &school, 256+1, 16, 0, 0);
+	palJobPut(16, school_Palettes.palCount, school_Palettes.data);
 
-	fixPrint(2,3,0,0,"1P \x12\x13\x10\x11: move picture");
-	fixPrint(2,4,0,0,"1P ABCD: flip mode");
-	fixPrint(2,5,0,0,"2P A: toggle rasters");
-	
+	scrollerInit(&frontScroll, &tree, 256+49, 16 + school_Palettes.palCount, 0, -16);
+	palJobPut(16 + school_Palettes.palCount,tree_Palettes.palCount, tree_Palettes.data);
+
+	scrollerInit(&letterScroll, &ttbg_c, 256+49+48, 16 + school_Palettes.palCount + tree_Palettes.palCount, lx, ly);
+	palJobPut(16 + school_Palettes.palCount + tree_Palettes.palCount, ttbg_c_Palettes.palCount, ttbg_c_Palettes.data);
+
+
+//	fixPrint(2,3,0,0,"1P \x12\x13\x10\x11: scroll");
+
+	volMEMWORD(0x400004)=0xeeee; // white
+	volMEMWORD(0x400002)=0x4444; // black
+
+
 	SCClose();
-	while(1) {
+
+	t = 0;
+	t2 = 0;
+
 		waitVBlank();
 
-		ps=volMEMBYTE(PS_CURRENT);
+	while(1) {
+		// BIOSF_SYSTEM_IO
+		//cur = animList[(tableShift/4) % 11];
+		//curpal = palList[(tableShift/4) % 11];
+		waitVBlank();
+
+
+		// init next frame of animation, and the palette for it
+//		pictureInit(&scroll, cur, 43, 16 + ttbg_a_Palettes.palCount + ttbg_b_Palettes.palCount, scrollx, scrolly, FLIP_NONE);
+//		palJobPut(16 + ttbg_a_Palettes.palCount + ttbg_b_Palettes.palCount, curpal->palCount, curpal->data);
+
+		// BIOSF_SYSTEM_IO
+
+		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
+		jobMeterColor(JOB_PURPLE);
+
 		p1=volMEMBYTE(P1_CURRENT);
 		p2=volMEMBYTE(P2_CURRENT);
-		p1e=volMEMBYTE(P1_EDGE);
-		p2e=volMEMBYTE(P2_EDGE);
+		ps=volMEMBYTE(PS_CURRENT);
 		
 		if((ps&P1_START)&&(ps&P2_START)) {
-			clearSprites(1, terrypict.tileWidth);
-			TInextTable=0;
+			clearSprites(1, 42+ffbg_c.tileWidth);
 			SCClose();
 			waitVBlank();
-			unloadTIirq();
 			return;
 		}
 
 		if(p1&JOY_UP)	y--;
 		if(p1&JOY_DOWN)	y++;
-		if(p1&JOY_LEFT)	x--;
-		if(p1&JOY_RIGHT)	x++;
-		
-		if(p2e&JOY_A)	raster^=1;
+//		if(p1&JOY_LEFT)	x--;
+//		if(p1&JOY_RIGHT)	x++;
 
-		//fixPrintf(2,2,0,0,"%d",DAT_droppedFrames);
-		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
+		t2++;
+		if (t2>1) { millis = DAT_frameCounter/(2); t = millis; t2=0; }
+
+//		fixPrintf(2,3,0,0,"%d", millis);
+
+		if (millis > 880 && texto == 0) {
+			clearSprites(0, 512);
+			SCClose();
+			waitVBlank();
+
+			break;
+		}
+
+		if (millis > 880 && texto == 1) {
+			clearSprites(0, 512);
+			SCClose();
+			waitVBlank();
+
+			break;
+		}
+
+		x=((t*1)%400);
+
+		if (t >= 50) t3 = t-50;
+
+		if (t3 > 0) {
+
+			if (ly >= -15) { 
+				ly = -15;
+				if (tl < 9) {
+					if (text[tl][lt] != '0') fixPrintf(tox+5+lt,toy+tl*2+ee,0,0,"%c",text[tl][lt]);
+					lt2++;
+					if (lt2>6) {lt++; lt2=0;}
+					if (lt >= strlen(text[tl])) { lt = 0; tl++; if (tl == 1 && texto == 0) ee++; if (tl == 4) ee++; }
+					if (tl >= 8) tl = 9;
+				}
+			}
+			else {
+				lx = -105+sintab[t3*8 % 1023]>>5;
+				ly = (-198+t3)+(sintab[t3*8 % 1023]>>4);
+			}
+		}
+		if(x<FRONT_MIN_X) x=FRONT_MIN_X;
+		else if(x>FRONT_MAX_X) x=FRONT_MAX_X;
+		if(y<FRONT_MIN_Y) y=FRONT_MIN_Y;
+		else if(y>FRONT_MAX_Y) y=FRONT_MAX_Y;
+
+//		pictureSetPos(&scroll,320,scrolly);
+
+		backX=(((x-8)*141)/299)+BACK_MIN_X;
+		backY=(((y-16)*3)/8)+BACK_MIN_Y;
+
+			
 		jobMeterColor(JOB_BLUE);
 
-		if(p1e&JOY_A)	pictureSetFlip(&testPict,FLIP_NONE);
-		if(p1e&JOY_B)	pictureSetFlip(&testPict,FLIP_X);
-		if(p1e&JOY_C)	pictureSetFlip(&testPict,FLIP_Y);
-		if(p1e&JOY_D)	pictureSetFlip(&testPict,FLIP_XY);
+		scrollerSetPos(&backScroll, 0, 0);
+		scrollerSetPos(&letterScroll, lx+8, ly);
 
-		pictureSetPos(&testPict, x, y);
+		SCClose();
 
+		draw_transition();
+/*
 		if(raster) {
 			TInextTable=(TInextTable==rasterData0)?rasterData1:rasterData0;
 			dataPtr=TInextTable;
-			rasterAddr=0x8400+testPict.baseSprite;
+			rasterAddr=0x8400+scroll.baseSprite;
 
 			if(p2&JOY_B) for(i=0;i<50000;i++);	//induce frameskipping
 
-			TIbase=TI_ZERO+(y>0?384*y:0); //timing to first line
+			TIbase=TI_ZERO+(scrolly>0?((384*scrolly)):0); //timing to first line
 
-			displayedRasters=(testPict.info->tileHeight<<4)-(y>=0?0:0-y);
-			if(displayedRasters+y>224) displayedRasters=224-y;
+			displayedRasters=(scroll.info->tileHeight<<4)-(scrolly>=0?0:0-scrolly);
+			if(displayedRasters+scrolly>224) displayedRasters=224-scrolly;
 			if(displayedRasters<0) displayedRasters=0;
 
-			i=(y>=0)?0:0-y;
+			i=(scrolly>=0)?0:0-scrolly;
 			for(j=0;j<displayedRasters;j++) {
 				*dataPtr++=rasterAddr;
 				if(!(j&0x1))
-					*dataPtr++=(x+(sinTable[(i+tableShift)&0x3f]-32))<<7;
-				else	*dataPtr++=(x-(sinTable[(i+1+tableShift)&0x3f]-32))<<7;
+					*dataPtr++=(scrollx+(sinTable[(i+tableShift)&0x3f]+32))<<4;
+				else	*dataPtr++=(scrollx+(sinTable[(i+1+tableShift)&0x3f]+31))<<4;
 				i++;
 			}
-			SC234Put(rasterAddr,x<<7); //restore pos
+			SC234Put(rasterAddr,scrollx<<7); //restore pos
 			*dataPtr++=0x0000;
 			*dataPtr++=0x0000;	//end
 		} else {
-			SC234Put(rasterAddr,x<<7); //restore position
+			SC234Put(rasterAddr,scrollx<<7); //restore position
 			TInextTable=0;
 		}
 
 		tableShift++;
-		jobMeterColor(JOB_GREEN);
-		SCClose();
-	}
-}
 */
-
-#define SCROLLSPEED 1.06
-void rasterScrollDemo() {
-	BYTE p1,ps;
-	pictureInfo frontLayerInfo, backLayerInfo;
-	picture frontLayer, backLayer;
-	short posY=-192;
-	ushort rasterData0[256],rasterData1[256];
-	ushort *rasterData;
-	float scrollAcc;
-	int scrollPos[34];
-	int scrollValues[34];
-	ushort backAddr=0x8401;
-	ushort frontAddr=0x8421;
-	int x,y;
-	short frontPosX[13],backPosX[13];
-	ushort skipY;
-	ushort firstLine;
-
-	//layers were merged to save up tiles/palettes
-	frontLayerInfo.colSize=tf4layers.colSize;
-	backLayerInfo.colSize=tf4layers.colSize;
-	frontLayerInfo.tileWidth=32;
-	backLayerInfo.tileWidth=32;
-	frontLayerInfo.tileHeight=tf4layers.tileHeight;
-	backLayerInfo.tileHeight=tf4layers.tileHeight;
-	//only using first map
-	frontLayerInfo.maps[0]=tf4layers.maps[0];
-	backLayerInfo.maps[0]=tf4layers.maps[0]+(tf4layers.colSize*32);
-
-	clearFixLayer();
-	initGfx();
-	jobMeterSetup(true);
-	loadTIirq(TI_MODE_DUAL_DATA);
-	TInextTable=0;
-
-	scrollValues[0]=1024;
-	scrollPos[0]=0;
-	scrollAcc=1024;
-	for(x=1;x<34;x++) {
-		scrollAcc*=SCROLLSPEED;
-		scrollValues[x]=(int)(scrollAcc+0.5);
-		scrollPos[x]=0;
-	}
-
-	pictureInit(&backLayer, &backLayerInfo,1,16,0,0,FLIP_NONE);
-	pictureInit(&frontLayer, &frontLayerInfo,33,16,0,0,FLIP_NONE);
-	palJobPut(16,tf4layers_Palettes.palCount,tf4layers_Palettes.data);
-
-	backgroundColor(0x38db);
-	fixPrint(0,1,0,0,"                                       ");
-	fixPrint(0,30,0,0,"                                       ");
-	SCClose();
-
-	while(1) {
-		waitVBlank();
-
-		while((volMEMWORD(0x3c0006)>>7)!=0x120); //line 16
-		jobMeterColor(JOB_BLUE);
-		
-		p1=volMEMBYTE(P1_CURRENT);
-		ps=volMEMBYTE(PS_CURRENT);
-
-		if((ps&P1_START)&&(ps&P2_START)) {
-			clearSprites(1, 64);
-			TInextTable=0;
-			SCClose();
-			waitVBlank();
-			unloadTIirq();
-			return;
-		}
-		if(p1&JOY_UP) if(posY<0) posY++;
-		if(p1&JOY_DOWN) if(posY>-288) posY--;
-
-		//update scroll values
-		for(x=0;x<34;x++) scrollPos[x]+=scrollValues[x];
-		frontPosX[0]=								(short)(0-(scrollPos[32]>>3));
-		frontPosX[1]=frontPosX[2]=					(short)(0-(scrollPos[24]>>3));
-		frontPosX[3]=frontPosX[4]=					(short)(0-(scrollPos[16]>>3));
-		frontPosX[5]=								(short)(0-(scrollPos[8]>>3));
-		frontPosX[6]=frontPosX[7]=frontPosX[8]=		(short)(0-(scrollPos[0]>>3));
-		frontPosX[9]=frontPosX[10]=frontPosX[11]=	(short)(0-(scrollPos[1]>>3));
-		frontPosX[12]=								(short)(0-(scrollPos[32]>>3));
-
-		backPosX[0]=								(short)(0-(scrollPos[24]>>3));
-		backPosX[1]=backPosX[2]=					(short)(0-(scrollPos[16]>>3));
-		backPosX[3]=backPosX[4]=					(short)(0-(scrollPos[8]>>3));
-		backPosX[5]=								(short)(0-(scrollPos[0]>>3));
-		backPosX[6]=backPosX[7]=backPosX[8]=		(short)(0-(scrollPos[0]>>4));
-		backPosX[9]=backPosX[10]=backPosX[11]=		(short)(0-(scrollPos[0]>>3));
-		backPosX[12]=								(short)(0-(scrollPos[1]>>3));
-
-		skipY=0-posY;
-		x=skipY>>5;
-		firstLine=32-(skipY&0x1f);
-
-		TIbase=TI_ZERO+(384*firstLine); //timing to first raster line
-		TInextTable=(TInextTable==rasterData0)?rasterData1:rasterData0;
-		rasterData=TInextTable;
-
-		pictureSetPos(&frontLayer,frontPosX[x]>>7,posY);
-		pictureSetPos(&backLayer,backPosX[x]>>7,posY);
-		//might need to force the update if base scroll position didn't change
-		SC234Put(frontAddr,frontPosX[x]);
-		SC234Put(backAddr,backPosX[x]);
-
-		if(skipY<164) { //can we see water?
-			TIreload=384*32;	//nope, 32px chunks
-			for(x++;x<13;x++) {
-				*rasterData++=frontAddr;
-				*rasterData++=frontPosX[x];
-				*rasterData++=backAddr;
-				*rasterData++=backPosX[x];
-				firstLine+=32;
-				if(firstLine>=224) break;
-			}
-		} else {
-			TIreload=384*4;		//yup, 4px chunks
-			for(x++;x<12;x++) {
-				for(y=0;y<8;y++) {
-					*rasterData++=frontAddr;
-					*rasterData++=frontPosX[x];
-					*rasterData++=backAddr;
-					*rasterData++=backPosX[x];
-				}
-				firstLine+=32;
-			}
-			x=1;
-			while(firstLine<224) {
-				*rasterData++=frontAddr;
-				*rasterData++=frontPosX[12];
-				*rasterData++=backAddr;
-				*rasterData++=0-(scrollPos[x++]>>3);
-				firstLine+=4;
-			}
-		}
-		*rasterData++=0x0000;
-		*rasterData++=0x0000;
+		tableShift++;
 		jobMeterColor(JOB_GREEN);
-		SCClose();
+
 	}
+
+
 }
-
-void tempTests() {
-/*
-	int x=0;
-	int y=0;
-
-	scroller scroll;
-
-	backgroundColor(0x7bbb); //BG color
-	clearFixLayer();
-	initGfx();
-	jobMeterSetup(true);
-
-	scrollerInit(&scroll, &wohd, 1, 16, x, y);
-	palJobPut(16, wohd_Palettes.palCount, wohd_Palettes.data);
-
-	SCClose();
-	while(1) {
-		waitVBlank();
-
-		p1=volMEMBYTE(P1_CURRENT);
-		p1e=volMEMBYTE(P1_EDGE);
-		ps=volMEMBYTE(PS_CURRENT);
-		
-		if((ps&P1_START)&&(ps&P2_START)) {
-			clearSprites(1, 21);
-			SCClose();
-			waitVBlank();
-			return;
-		}
-		
-		if(p1&JOY_UP)	y--;
-		if(p1&JOY_DOWN)	y++;
-		if(p1&JOY_LEFT)	x--;
-		if(p1&JOY_RIGHT)	x++;
-
-		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-		jobMeterColor(JOB_BLUE);
-		
-		if(p1e&JOY_C) scrollerInit(&scroll, &wohd, 1, 16, x, y);
-			else	scrollerSetPos(&scroll, x, y);
-		
-		jobMeterColor(JOB_GREEN);
-		fixPrintf(2,4,0,0,"%04d\xff%04d\xff\xff",x,y);
-		SCClose();
-	}
-*/
-}
-
 
 
 void startDemologic() {
@@ -1511,8 +1482,14 @@ void startDemologic() {
 	demopart_kiss();
 
 	texto = 1;
+	trastart = 0;
+	traframe = 0;
+	targetframe = 1705;
+	firstframe = 1700;
+	traend = 0;
+	tradir = 0;
 
-	//demopart_letter();
+	demopart_letter2();
 
 	demopart_sprite();
 

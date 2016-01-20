@@ -35,6 +35,10 @@ extern scrollerInfo ffbg_a;
 extern paletteInfo ffbg_a_Palettes;
 extern scrollerInfo ffbg_b;
 extern paletteInfo ffbg_b_Palettes;
+extern scrollerInfo school;
+extern paletteInfo school_Palettes;
+extern scrollerInfo tree;
+extern paletteInfo tree_Palettes;
 extern scrollerInfo ttbg_a;
 extern paletteInfo ttbg_a_Palettes;
 extern scrollerInfo ttbg_b;
@@ -51,8 +55,6 @@ extern pictureInfo pointer;
 extern paletteInfo pointer_Palettes;
 extern pictureInfo gradient;
 extern paletteInfo gradient_Palettes;
-extern pictureInfo tf4layers;
-extern paletteInfo tf4layers_Palettes;
 
 //animated sprites
 extern spriteInfo bmary_spr;
