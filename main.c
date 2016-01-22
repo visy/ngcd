@@ -74,7 +74,7 @@ void draw_transition() {
 			traframea = traframe;
 			if (tradir == 1) traframea = 16-traframe;
 			for (y = 0;y<30;y++) {
-					fixPrintf(0,y,0,0,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea);
+					fixPrintf(0,y,0,0,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea);
 			}
 			targetframe = t + 1;
 		}
@@ -187,8 +187,11 @@ else {
 
 //	fixPrint(2,3,0,0,"1P \x12\x13\x10\x11: scroll");
 
-	volMEMWORD(0x400004)=0xeeee; // white
-	volMEMWORD(0x400002)=0x4444; // black
+	volMEMWORD(0x400000)=0x8000; // black
+	volMEMWORD(0x400002)=0x9999; // black
+	volMEMWORD(0x400004)=0xbbbb; // black
+	volMEMWORD(0x400006)=0x2222; // black
+
 
 
 	SCClose();
@@ -463,8 +466,11 @@ void demopart_phone() {
 
 			if (t >= 600 && t < 800 && ml < 15) { 
 				backgroundColor(0xffff);
-				volMEMWORD(0x400004)=0xffff; // white
-				volMEMWORD(0x400002)=0xffff; // black
+
+	volMEMWORD(0x400000)=0x8000; // black
+	volMEMWORD(0x400002)=0xffff; // black
+	volMEMWORD(0x400004)=0xffff; // black
+	volMEMWORD(0x400006)=0xffff; // black
 				ly = -15;
 				if (tl < 9) {
 					if (text[tl+offer][lt] == '1') { ml = 50; continue; }
@@ -496,7 +502,7 @@ void demopart_phone() {
 		if (t > 600) scrollerSetPos(&layer2Scroll, 0, lp2);
 		if (t > 850) scrollerSetPos(&layer2Scroll, 0, lp2+(850-t));
 
-		t2=-20+millis;
+		t2=-40+millis;
 		if (t2 >= 464-260) t2=464-260;
 
 
@@ -582,8 +588,11 @@ void demopart_sakura() {
 //	scrollerInit(&layerfg2Scroll, &cherries_a, 1+32+32, 16+16+16, 0,0);
 //	palJobPut(16+16+16, cherries_a_Palettes.palCount, cherries_a_Palettes.data);
 
-	volMEMWORD(0x400004)=0xffff; // white
-	volMEMWORD(0x400002)=0xffff; // black
+	volMEMWORD(0x400000)=0x8000; // black
+	volMEMWORD(0x400006)=0xdddd; // black
+	volMEMWORD(0x400002)=0x3028; // black
+	volMEMWORD(0x400004)=0x254B; // black
+
 		scrollerSetPos(&layerfg1Scroll,-32-scrollx,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
 
 	SCClose();
@@ -1318,10 +1327,10 @@ void demopart_letter2() {
 
 //	fixPrint(2,3,0,0,"1P \x12\x13\x10\x11: scroll");
 
-	volMEMWORD(0x400004)=0xeeee; // white
-	volMEMWORD(0x400002)=0x4444; // black
-
-
+	volMEMWORD(0x400000)=0x8000; // black
+	volMEMWORD(0x400002)=0x9999; // black
+	volMEMWORD(0x400004)=0xbbbb; // black
+	volMEMWORD(0x400006)=0x2222; // black
 	SCClose();
 
 	t = 0;
@@ -1471,6 +1480,7 @@ void startDemologic() {
 	asm("clr.w %d0");
 	asm("move.w #0x0502,%d0");
 	asm("jsr 0xC0056A");
+
 	demopart_letter();
 
 	demopart_phone();
