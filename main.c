@@ -188,8 +188,8 @@ else {
 //	fixPrint(2,3,0,0,"1P \x12\x13\x10\x11: scroll");
 
 	volMEMWORD(0x400000)=0x8000; // black
-	volMEMWORD(0x400002)=0x9999; // black
-	volMEMWORD(0x400004)=0xbbbb; // black
+	volMEMWORD(0x400002)=0xcccc; // black
+	volMEMWORD(0x400004)=0x9999; // black
 	volMEMWORD(0x400006)=0x2222; // black
 
 
@@ -589,9 +589,14 @@ void demopart_sakura() {
 //	palJobPut(16+16+16, cherries_a_Palettes.palCount, cherries_a_Palettes.data);
 
 	volMEMWORD(0x400000)=0x8000; // black
-	volMEMWORD(0x400006)=0xdddd; // black
+	volMEMWORD(0x400006)=0xffff; // black
 	volMEMWORD(0x400002)=0x3028; // black
-	volMEMWORD(0x400004)=0x254B; // black
+	volMEMWORD(0x400004)=0x254b; // black
+
+//	volMEMWORD(0x400002)=0xcccc; // black
+//	volMEMWORD(0x400004)=0x9999; // black
+//	volMEMWORD(0x400006)=0x2222; // black
+
 
 		scrollerSetPos(&layerfg1Scroll,-32-scrollx,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
 
@@ -1328,8 +1333,8 @@ void demopart_letter2() {
 //	fixPrint(2,3,0,0,"1P \x12\x13\x10\x11: scroll");
 
 	volMEMWORD(0x400000)=0x8000; // black
-	volMEMWORD(0x400002)=0x9999; // black
-	volMEMWORD(0x400004)=0xbbbb; // black
+	volMEMWORD(0x400002)=0xcccc; // black
+	volMEMWORD(0x400004)=0x9999; // black
 	volMEMWORD(0x400006)=0x2222; // black
 	SCClose();
 
