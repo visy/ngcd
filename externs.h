@@ -49,6 +49,8 @@ extern scrollerInfo ttbg_c;
 extern paletteInfo ttbg_c_Palettes;
 
 //pictures
+extern pictureInfo cursor;
+extern paletteInfo cursor_Palettes;
 extern pictureInfo ffbg_c;
 extern paletteInfo ffbg_c_Palettes;
 extern pictureInfo topleft;

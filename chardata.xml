@@ -67,8 +67,12 @@
  	<file>gfx\sakura.png</file>
   </scrl>
 
+  <pict id="cursor">
+    <file>gfx\cursor.png</file>
+  </pict>
+
   <scrl id="title">
-    <file>gfx\title.png</file>
+    <file>gfx\title2.png</file>
   </scrl>
   <scrl id="map">
     <file>gfx\map.png</file>

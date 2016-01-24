@@ -335,6 +335,7 @@ else {
 void demopart_phone() {
 	int lt = 0;
 	int initf = 0;
+	int blinkcnt = 0;
 	int lt2 = 0;
 	int clearflag = 1;
 	int tl = 0;
@@ -372,7 +373,7 @@ void demopart_phone() {
 	scroller layerfrScroll;
 	scroller layer2Scroll;
 	scroller errorScroll;
-
+	picture cursorPic;
 
 	picture dovrot;
 	pictureInfo* cur;
@@ -416,6 +417,10 @@ void demopart_phone() {
 	palJobPut(16+16+16+16, dov_Palettes.palCount, dov_Palettes.data);
 
 
+	pictureInit(&cursorPic,&cursor,232,200,50,128,FLIP_NONE);
+	palJobPut(200,cursor_Palettes.palCount,&cursor_Palettes.data);
+	pictureHide(&cursorPic);
+
 	SCClose();
 
 	t = 0;
@@ -429,6 +434,8 @@ void demopart_phone() {
 		// BIOSF_SYSTEM_IO
 
 		waitVBlank();
+			blinkcnt++;
+
 		if (t>820) break;
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
@@ -498,8 +505,23 @@ void demopart_phone() {
 		if (t2>3) scrollerSetPos(&layerbgScroll, 0, t2+42);
 		if (t2>3) scrollerSetPos(&layerfrScroll, 0, -1+t2+(sintab[(t3*7)%1023]>>5));
 		
-		if (t3>3 && t3 < 700) scrollerSetPos(&errorScroll, 0, (sintab[(t3*7)%1023]>>5)-4);
-		else if (t3 >= 700 && t3 < 790) scrollerSetPos(&errorScroll, 0-(t3-700)*3, (sintab[(t3*7)%1023]>>5)-4);
+		if (t3>3 && t3 < 550) scrollerSetPos(&errorScroll, 0, ((256-t3/2) < 0 ? 0 : (256-t3/2)) +(sintab[(t3*7)%1023]>>5)-4);
+		else if (t3>=550 && t3 < 800) scrollerSetPos(&errorScroll, 0, (sintab[(t3*7)%1023]>>5)-4);
+		else if (t3 >= 800 && t3 < 890) scrollerSetPos(&errorScroll, 0-(t3-800)*3, (sintab[(t3*7)%1023]>>5)-4);
+
+		if (t3>=550 && t<800) {
+
+			if (blinkcnt == 32) pictureHide(&cursorPic); 
+
+			if (blinkcnt > 64) blinkcnt = 0;
+			if (blinkcnt == 0) pictureShow(&cursorPic);
+
+			if (blinkcnt < 32) pictureSetPos(&cursorPic,37,128-(sintab[(t3*7)%1023]>>5)+3);
+
+		}
+		if (t3 >= 800) {
+			pictureHide(&cursorPic);
+		}
 
 		lp2 = -180+(t-600)+(sintab[(t3*4)%1023]>>5);
 		if (lp2 >= -20) lp2 = -20;
