@@ -56,6 +56,10 @@
 <frame>94,0:2,4</frame>
 </sprt>
 
+  <scrl id="fourk">
+ 	<file>gfx\4k.png</file>
+  </scrl>
+
   <scrl id="isobg">
  	<file>gfx\isobg.png</file>
   </scrl>
@@ -63,8 +67,8 @@
  	<file>gfx\sakura.png</file>
   </scrl>
 
-  <scrl id="error">
-    <file>gfx\error.png</file>
+  <scrl id="title">
+    <file>gfx\title.png</file>
   </scrl>
   <scrl id="map">
     <file>gfx\map.png</file>

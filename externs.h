@@ -1,10 +1,12 @@
 //scrollers
+extern scrollerInfo fourk;
+extern paletteInfo fourk_Palettes;
 extern scrollerInfo isobg;
 extern paletteInfo isobg_Palettes;
 extern scrollerInfo sakura;
 extern paletteInfo sakura_Palettes;
-extern scrollerInfo error;
-extern paletteInfo error_Palettes;
+extern scrollerInfo title;
+extern paletteInfo title_Palettes;
 extern scrollerInfo map;
 extern paletteInfo map_Palettes;
 extern scrollerInfo meta;

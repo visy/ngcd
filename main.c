@@ -103,7 +103,6 @@ void draw_transition() {
 
 }
 
-
 void demopart_letter() {
 	int x=FRONT_START_X;
 	int y=FRONT_START_Y;
@@ -206,7 +205,6 @@ else {
 		//cur = animList[(tableShift/4) % 11];
 		//curpal = palList[(tableShift/4) % 11];
 		waitVBlank();
-
 
 		// init next frame of animation, and the palette for it
 //		pictureInit(&scroll, cur, 43, 16 + ttbg_a_Palettes.palCount + ttbg_b_Palettes.palCount, scrollx, scrolly, FLIP_NONE);
@@ -336,6 +334,7 @@ else {
 
 void demopart_phone() {
 	int lt = 0;
+	int initf = 0;
 	int lt2 = 0;
 	int clearflag = 1;
 	int tl = 0;
@@ -407,13 +406,15 @@ void demopart_phone() {
 
 	scrollerInit(&frontScroll, &map, 1, 16, x, y);
 	palJobPut(16, map_Palettes.palCount, map_Palettes.data);
-	scrollerInit(&layer2Scroll, &kaverit, 262+1, 16+16, 0, -224);
-	palJobPut(16+16, kaverit_Palettes.palCount, kaverit_Palettes.data);
 
-	scrollerInit(&layerbgScroll, &dovbg, 262+1+42, 16+16+16, 0, 45);
+	scrollerInit(&errorScroll, &title, 100, 16+16+16+16+16, 0, 0);
+	palJobPut(16+16+16+16+16, title_Palettes.palCount, title_Palettes.data);
+
+	scrollerInit(&layerbgScroll, &dovbg, 150, 16+16+16, 0, 45);
 	palJobPut(16+16+16, dovbg_Palettes.palCount, dovbg_Palettes.data);
-	scrollerInit(&layerfrScroll, &dov, 262+1+42+42, 16+16+16+16, 0, 4);
+	scrollerInit(&layerfrScroll, &dov, 200, 16+16+16+16, 0, 4);
 	palJobPut(16+16+16+16, dov_Palettes.palCount, dov_Palettes.data);
+
 
 	SCClose();
 
@@ -496,14 +497,22 @@ void demopart_phone() {
 
 		if (t2>3) scrollerSetPos(&layerbgScroll, 0, t2+42);
 		if (t2>3) scrollerSetPos(&layerfrScroll, 0, -1+t2+(sintab[(t3*7)%1023]>>5));
+		
+		if (t3>3 && t3 < 700) scrollerSetPos(&errorScroll, 0, (sintab[(t3*7)%1023]>>5)-4);
+		else if (t3 >= 700 && t3 < 790) scrollerSetPos(&errorScroll, 0-(t3-700)*3, (sintab[(t3*7)%1023]>>5)-4);
 
 		lp2 = -180+(t-600)+(sintab[(t3*4)%1023]>>5);
 		if (lp2 >= -20) lp2 = -20;
+		if (t > 599 && initf == 0) {
+			scrollerInit(&layer2Scroll, &kaverit, 262+1, 16+16, 0, -224);
+			palJobPut(16+16, kaverit_Palettes.palCount, kaverit_Palettes.data);
+			initf = 1;
+		}
 		if (t > 600) scrollerSetPos(&layer2Scroll, 0, lp2);
 		if (t > 850) scrollerSetPos(&layer2Scroll, 0, lp2+(850-t));
 
 		t2=-40+millis;
-		if (t2 >= 464-260) t2=464-260;
+		if (t2 >= 464-262) t2=464-262;
 
 
 
@@ -1476,6 +1485,81 @@ void demopart_letter2() {
 
 }
 
+void demopart_4k() {
+	int x=87;
+	int y=136;
+	int i=0;
+	int t =0;
+	int t3=0;
+	int relX,relY;
+	short showdebug=false;
+	scroller frontScroll;
+
+	spritePool testPool;
+	uint *drawTable[16+(6*6)+100];
+	uint *drawTablePtr;
+	int sortSize;
+	aSprite sprites[6*6];
+	picture ptr,tleft,bright;
+	short way1=JOY_UP,way2=JOY_UP;
+	short visible=true;
+
+	initGfx();
+	jobMeterSetup(true);
+
+	scrollerInit(&frontScroll, &fourk, 1, 32, 0, 0);
+	palJobPut(32, fourk_Palettes.palCount, fourk_Palettes.data);
+
+	SCClose();
+
+	startframe = DAT_frameCounter+1;
+
+	while(1) {
+		waitVBlank();
+	backgroundColor(0x0000+t*1); //BG color
+
+		p1=volMEMBYTE(P1_CURRENT);
+		p1e=volMEMBYTE(P1_EDGE);
+		p2=volMEMBYTE(P2_EDGE);
+		ps=volMEMBYTE(PS_CURRENT);
+
+		if((ps&P1_START)&&(ps&P2_START)) {
+			clearSprites(1, 150);
+			clearSprites(200, 3);
+			SCClose();
+			waitVBlank();
+			return;
+		}
+
+		if(p1&JOY_UP)	y--;
+		if(p1&JOY_DOWN)	y++;
+		if(p1&JOY_LEFT)	x--;
+		if(p1&JOY_RIGHT)	x++;
+
+		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
+		jobMeterColor(JOB_BLUE);
+
+		//while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
+//		sortSprites(&drawTable[1],sortSize);
+		jobMeterColor(JOB_PINK);
+
+
+		t3 = DAT_frameCounter-startframe;
+
+		millis = t3*(t3*0.00007); 
+		t = millis;
+
+		scrollerSetPos(&frontScroll, 0, 0);
+
+		SCClose();
+
+				draw_transition();
+
+
+
+	}
+}
+
 
 void startDemologic() {
 	int i = 0;
@@ -1485,6 +1569,9 @@ void startDemologic() {
 	asm("clr.w %d0");
 	asm("move.w #0x0502,%d0");
 	asm("jsr 0xC0056A");
+
+
+//	demopart_4k();
 
 	demopart_letter();
 
