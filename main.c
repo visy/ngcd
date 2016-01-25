@@ -21,6 +21,265 @@
 #define SHIFT_AMOUNT 16 // 2^16 = 65536
 #define SHIFT_MASK ((1 << SHIFT_AMOUNT) - 1) // 65535 (all LSB set, all MSB clear)
 
+struct palette_t
+{
+	int original_color, new_color;
+	int index, red, green, blue, index_temp, red_temp, green_temp, blue_temp;
+	int RGB63_red, RGB63_green, RGB63_blue, RGB63_red_index, RGB63_green_index, RGB63_blue_index;
+	int RGB63_red_temp, RGB63_green_temp, RGB63_blue_temp, RGB63_red_index_temp, RGB63_green_index_temp, RGB63_blue_index_temp;
+};
+
+struct palette_t color[256];
+scroller kissScroll;
+
+// FADE OUT //////////////////////////////////////////////////////////////////
+
+void fade_out()
+{
+	int palette_no = 0; // first palette to start with
+	int i;
+	int steps=0;
+
+	waitVBlank();
+
+	for(i=0; i<128; i++)
+	{
+		// save original palettes and calculate hex values for index bits and each color //
+
+		color[i].original_color  = volMEMWORD(4194304+(i*2)+(palette_no*32));  // 4194304 decimal = 0x400000 hex adress of color 0 of palette 0
+
+		color[i].blue=color[i].original_color/16;	// quotient
+		color[i].green=color[i].blue/16;		// quotient
+		color[i].red=color[i].green/16;			// quotient
+		color[i].index=color[i].red/16;			// quotient
+
+		color[i].index=color[i].red%16;			// remainder
+		color[i].red=color[i].green%16;			// remainder
+		color[i].green=color[i].blue%16;		// remainder
+		color[i].blue=color[i].original_color%16;	// remainder
+
+		// convert to RGB63 ///////////////////////////////////////////////
+
+		if(color[i].index==0) {color[i].RGB63_red_index=1; color[i].RGB63_green_index=1; color[i].RGB63_blue_index=1;}
+		if(color[i].index==1) {color[i].RGB63_red_index=1; color[i].RGB63_green_index=1; color[i].RGB63_blue_index=3;}
+		if(color[i].index==2) {color[i].RGB63_red_index=1; color[i].RGB63_green_index=3; color[i].RGB63_blue_index=1;}
+		if(color[i].index==3) {color[i].RGB63_red_index=1; color[i].RGB63_green_index=3; color[i].RGB63_blue_index=3;}
+		if(color[i].index==4) {color[i].RGB63_red_index=3; color[i].RGB63_green_index=1; color[i].RGB63_blue_index=1;}
+		if(color[i].index==5) {color[i].RGB63_red_index=3; color[i].RGB63_green_index=1; color[i].RGB63_blue_index=3;}
+		if(color[i].index==6) {color[i].RGB63_red_index=3; color[i].RGB63_green_index=3; color[i].RGB63_blue_index=1;}
+		if(color[i].index==7) {color[i].RGB63_red_index=3; color[i].RGB63_green_index=3; color[i].RGB63_blue_index=3;}
+		if(color[i].index==8) {color[i].RGB63_red_index=0; color[i].RGB63_green_index=0; color[i].RGB63_blue_index=0;}
+		if(color[i].index==9) {color[i].RGB63_red_index=0; color[i].RGB63_green_index=0; color[i].RGB63_blue_index=2;}
+		if(color[i].index==10){color[i].RGB63_red_index=0; color[i].RGB63_green_index=2; color[i].RGB63_blue_index=0;}
+		if(color[i].index==11){color[i].RGB63_red_index=0; color[i].RGB63_green_index=2; color[i].RGB63_blue_index=2;}
+		if(color[i].index==12){color[i].RGB63_red_index=2; color[i].RGB63_green_index=0; color[i].RGB63_blue_index=0;}
+		if(color[i].index==13){color[i].RGB63_red_index=2; color[i].RGB63_green_index=0; color[i].RGB63_blue_index=2;}
+		if(color[i].index==14){color[i].RGB63_red_index=2; color[i].RGB63_green_index=2; color[i].RGB63_blue_index=0;}
+		if(color[i].index==15){color[i].RGB63_red_index=2; color[i].RGB63_green_index=2; color[i].RGB63_blue_index=2;}
+
+		color[i].RGB63_red   = color[i].red   * 4 + color[i].RGB63_red_index;
+		color[i].RGB63_green = color[i].green * 4 + color[i].RGB63_green_index;
+		color[i].RGB63_blue  = color[i].blue  * 4 + color[i].RGB63_blue_index;
+
+		// copy ASM Hex Color Code values to temporary variables ///////////
+
+		color[i].index_temp = color[i].index;
+		color[i].red_temp   = color[i].red;
+		color[i].green_temp = color[i].green;
+		color[i].blue_temp  = color[i].blue;
+	}
+
+	while(1)
+	{
+		waitVBlank();
+
+
+		steps-=1;
+
+		for(i=0; i<256; i++)
+		{
+			// add steps to RGB63 temporary values /////////////////////////
+
+			color[i].RGB63_red_temp   = color[i].RGB63_red - steps;
+			color[i].RGB63_green_temp = color[i].RGB63_green - steps;
+			color[i].RGB63_blue_temp  = color[i].RGB63_blue - steps;
+
+			// keep values inside the range of 0 to 63 /////////////////////
+
+			if(color[i].RGB63_red_temp>63) color[i].RGB63_red_temp=63;
+			if(color[i].RGB63_red_temp<0) color[i].RGB63_red_temp=0;
+			if(color[i].RGB63_green_temp>63) color[i].RGB63_green_temp=63;
+			if(color[i].RGB63_green_temp<0) color[i].RGB63_green_temp=0;
+			if(color[i].RGB63_blue_temp>63) color[i].RGB63_blue_temp=63;
+			if(color[i].RGB63_blue_temp<0) color[i].RGB63_blue_temp=0;
+
+			// convert RGB63 back to ASM Hex Color Code ////////////////////
+
+			color[i].RGB63_red_index_temp = color[i].RGB63_red_temp%4;
+			color[i].red_temp = color[i].RGB63_red_temp/4;
+
+			color[i].RGB63_green_index_temp = color[i].RGB63_green_temp%4;
+			color[i].green_temp = color[i].RGB63_green_temp/4;
+
+			color[i].RGB63_blue_index_temp = color[i].RGB63_blue_temp%4;
+			color[i].blue_temp = color[i].RGB63_blue_temp/4;
+
+			if(color[i].RGB63_red_index_temp==1 && color[i].RGB63_green_index_temp==1 && color[i].RGB63_blue_index_temp==1) color[i].index_temp=0;
+			if(color[i].RGB63_red_index_temp==1 && color[i].RGB63_green_index_temp==1 && color[i].RGB63_blue_index_temp==3) color[i].index_temp=1;
+			if(color[i].RGB63_red_index_temp==1 && color[i].RGB63_green_index_temp==3 && color[i].RGB63_blue_index_temp==1) color[i].index_temp=2;
+			if(color[i].RGB63_red_index_temp==1 && color[i].RGB63_green_index_temp==3 && color[i].RGB63_blue_index_temp==3) color[i].index_temp=3;
+			if(color[i].RGB63_red_index_temp==3 && color[i].RGB63_green_index_temp==1 && color[i].RGB63_blue_index_temp==1) color[i].index_temp=4;
+			if(color[i].RGB63_red_index_temp==3 && color[i].RGB63_green_index_temp==1 && color[i].RGB63_blue_index_temp==3) color[i].index_temp=5;
+			if(color[i].RGB63_red_index_temp==3 && color[i].RGB63_green_index_temp==3 && color[i].RGB63_blue_index_temp==1) color[i].index_temp=6;
+			if(color[i].RGB63_red_index_temp==3 && color[i].RGB63_green_index_temp==3 && color[i].RGB63_blue_index_temp==3) color[i].index_temp=7;
+			if(color[i].RGB63_red_index_temp==0 && color[i].RGB63_green_index_temp==0 && color[i].RGB63_blue_index_temp==0) color[i].index_temp=8;
+			if(color[i].RGB63_red_index_temp==0 && color[i].RGB63_green_index_temp==0 && color[i].RGB63_blue_index_temp==2) color[i].index_temp=9;
+			if(color[i].RGB63_red_index_temp==0 && color[i].RGB63_green_index_temp==2 && color[i].RGB63_blue_index_temp==0) color[i].index_temp=10;
+			if(color[i].RGB63_red_index_temp==0 && color[i].RGB63_green_index_temp==2 && color[i].RGB63_blue_index_temp==2) color[i].index_temp=11;
+			if(color[i].RGB63_red_index_temp==2 && color[i].RGB63_green_index_temp==0 && color[i].RGB63_blue_index_temp==0) color[i].index_temp=12;
+			if(color[i].RGB63_red_index_temp==2 && color[i].RGB63_green_index_temp==0 && color[i].RGB63_blue_index_temp==2) color[i].index_temp=13;
+			if(color[i].RGB63_red_index_temp==2 && color[i].RGB63_green_index_temp==2 && color[i].RGB63_blue_index_temp==0) color[i].index_temp=14;
+			if(color[i].RGB63_red_index_temp==2 && color[i].RGB63_green_index_temp==2 && color[i].RGB63_blue_index_temp==2) color[i].index_temp=15;
+
+			// write new ASM Hex Color Code to color adress ////////////////
+
+			color[i].new_color=(color[i].index_temp)*4096+(color[i].red_temp)*256+(color[i].green_temp)*16+(color[i].blue_temp);
+			volMEMWORD(4194304+(i*2)+(palette_no*32)) = color[i].new_color;
+		}
+		backgroundColor(color[2].new_color);
+		SCClose();
+		if(steps<=-64) break; // exit loop when done
+	}
+
+
+}
+
+// FADE IN //////////////////////////////////////////////////////////////////
+
+void prepare_fade_in()
+{
+	int palette_no = 5; // first palette to start with
+	int i;
+	int steps=-64;
+
+	waitVBlank();
+
+	for(i=0; i<128; i++)
+	{
+		// save original palettes and calculate hex values for index bits and each color //
+
+		color[i].original_color  = volMEMWORD(4194304+(i*2)+(palette_no*32));  // 4194304 decimal = 0x400000 hex adress of color 0 of palette 0
+
+		color[i].blue=color[i].original_color/16;	// quotient
+		color[i].green=color[i].blue/16;		// quotient
+		color[i].red=color[i].green/16;			// quotient
+		color[i].index=color[i].red/16;			// quotient
+
+		color[i].index=color[i].red%16;			// remainder
+		color[i].red=color[i].green%16;			// remainder
+		color[i].green=color[i].blue%16;		// remainder
+		color[i].blue=color[i].original_color%16;	// remainder
+
+		// convert to RGB 63 ////////////////////////////////////////////////////
+
+		if(color[i].index==0) {color[i].RGB63_red_index=1; color[i].RGB63_green_index=1; color[i].RGB63_blue_index=1;}
+		if(color[i].index==1) {color[i].RGB63_red_index=1; color[i].RGB63_green_index=1; color[i].RGB63_blue_index=3;}
+		if(color[i].index==2) {color[i].RGB63_red_index=1; color[i].RGB63_green_index=3; color[i].RGB63_blue_index=1;}
+		if(color[i].index==3) {color[i].RGB63_red_index=1; color[i].RGB63_green_index=3; color[i].RGB63_blue_index=3;}
+		if(color[i].index==4) {color[i].RGB63_red_index=3; color[i].RGB63_green_index=1; color[i].RGB63_blue_index=1;}
+		if(color[i].index==5) {color[i].RGB63_red_index=3; color[i].RGB63_green_index=1; color[i].RGB63_blue_index=3;}
+		if(color[i].index==6) {color[i].RGB63_red_index=3; color[i].RGB63_green_index=3; color[i].RGB63_blue_index=1;}
+		if(color[i].index==7) {color[i].RGB63_red_index=3; color[i].RGB63_green_index=3; color[i].RGB63_blue_index=3;}
+		if(color[i].index==8) {color[i].RGB63_red_index=0; color[i].RGB63_green_index=0; color[i].RGB63_blue_index=0;}
+		if(color[i].index==9) {color[i].RGB63_red_index=0; color[i].RGB63_green_index=0; color[i].RGB63_blue_index=2;}
+		if(color[i].index==10){color[i].RGB63_red_index=0; color[i].RGB63_green_index=2; color[i].RGB63_blue_index=0;}
+		if(color[i].index==11){color[i].RGB63_red_index=0; color[i].RGB63_green_index=2; color[i].RGB63_blue_index=2;}
+		if(color[i].index==12){color[i].RGB63_red_index=2; color[i].RGB63_green_index=0; color[i].RGB63_blue_index=0;}
+		if(color[i].index==13){color[i].RGB63_red_index=2; color[i].RGB63_green_index=0; color[i].RGB63_blue_index=2;}
+		if(color[i].index==14){color[i].RGB63_red_index=2; color[i].RGB63_green_index=2; color[i].RGB63_blue_index=0;}
+		if(color[i].index==15){color[i].RGB63_red_index=2; color[i].RGB63_green_index=2; color[i].RGB63_blue_index=2;}
+
+		color[i].RGB63_red   = color[i].red   * 4 + color[i].RGB63_red_index;
+		color[i].RGB63_green = color[i].green * 4 + color[i].RGB63_green_index;
+		color[i].RGB63_blue  = color[i].blue  * 4 + color[i].RGB63_blue_index;
+
+		// copy hex values to temporary variables ///////////////////////////////
+
+		color[i].index_temp = color[i].index;
+		color[i].red_temp   = color[i].red;
+		color[i].green_temp = color[i].green;
+		color[i].blue_temp  = color[i].blue;
+
+		// set all color palettes to black //////////////////////////////////////
+
+		volMEMWORD(4194304+(i*2)+(palette_no*32)) = 0x0000;
+	}
+}
+
+int insteps=-64;
+
+void fade_in()
+{
+	int palette_no;
+	int i=0;
+
+	palette_no = 5; // first palette to start with
+
+	if (insteps >= 0) return;
+	insteps+=2;
+
+	for(i=0; i<128; i++)
+	{
+		// add steps to RGB63 temporary values ////////////////////
+
+		color[i].RGB63_red_temp   = color[i].RGB63_red + insteps;
+		color[i].RGB63_green_temp = color[i].RGB63_green + insteps;
+		color[i].RGB63_blue_temp  = color[i].RGB63_blue + insteps;
+
+		// keep values inside the range of 0 to 63 ////////////////
+
+		if(color[i].RGB63_red_temp>63) color[i].RGB63_red_temp=63;
+		if(color[i].RGB63_red_temp<0) color[i].RGB63_red_temp=0;
+		if(color[i].RGB63_green_temp>63) color[i].RGB63_green_temp=63;
+		if(color[i].RGB63_green_temp<0) color[i].RGB63_green_temp=0;
+		if(color[i].RGB63_blue_temp>63) color[i].RGB63_blue_temp=63;
+		if(color[i].RGB63_blue_temp<0) color[i].RGB63_blue_temp=0;
+
+		// convert RGB63 back to ASM Hex Color Code ////////////////
+
+		color[i].RGB63_red_index_temp = color[i].RGB63_red_temp%4;
+		color[i].red_temp = color[i].RGB63_red_temp/4;
+
+		color[i].RGB63_green_index_temp = color[i].RGB63_green_temp%4;
+		color[i].green_temp = color[i].RGB63_green_temp/4;
+
+		color[i].RGB63_blue_index_temp = color[i].RGB63_blue_temp%4;
+		color[i].blue_temp = color[i].RGB63_blue_temp/4;
+
+		if(color[i].RGB63_red_index_temp==1 && color[i].RGB63_green_index_temp==1 && color[i].RGB63_blue_index_temp==1) color[i].index_temp=0;
+		if(color[i].RGB63_red_index_temp==1 && color[i].RGB63_green_index_temp==1 && color[i].RGB63_blue_index_temp==3) color[i].index_temp=1;
+		if(color[i].RGB63_red_index_temp==1 && color[i].RGB63_green_index_temp==3 && color[i].RGB63_blue_index_temp==1) color[i].index_temp=2;
+		if(color[i].RGB63_red_index_temp==1 && color[i].RGB63_green_index_temp==3 && color[i].RGB63_blue_index_temp==3) color[i].index_temp=3;
+		if(color[i].RGB63_red_index_temp==3 && color[i].RGB63_green_index_temp==1 && color[i].RGB63_blue_index_temp==1) color[i].index_temp=4;
+		if(color[i].RGB63_red_index_temp==3 && color[i].RGB63_green_index_temp==1 && color[i].RGB63_blue_index_temp==3) color[i].index_temp=5;
+		if(color[i].RGB63_red_index_temp==3 && color[i].RGB63_green_index_temp==3 && color[i].RGB63_blue_index_temp==1) color[i].index_temp=6;
+		if(color[i].RGB63_red_index_temp==3 && color[i].RGB63_green_index_temp==3 && color[i].RGB63_blue_index_temp==3) color[i].index_temp=7;
+		if(color[i].RGB63_red_index_temp==0 && color[i].RGB63_green_index_temp==0 && color[i].RGB63_blue_index_temp==0) color[i].index_temp=8;
+		if(color[i].RGB63_red_index_temp==0 && color[i].RGB63_green_index_temp==0 && color[i].RGB63_blue_index_temp==2) color[i].index_temp=9;
+		if(color[i].RGB63_red_index_temp==0 && color[i].RGB63_green_index_temp==2 && color[i].RGB63_blue_index_temp==0) color[i].index_temp=10;
+		if(color[i].RGB63_red_index_temp==0 && color[i].RGB63_green_index_temp==2 && color[i].RGB63_blue_index_temp==2) color[i].index_temp=11;
+		if(color[i].RGB63_red_index_temp==2 && color[i].RGB63_green_index_temp==0 && color[i].RGB63_blue_index_temp==0) color[i].index_temp=12;
+		if(color[i].RGB63_red_index_temp==2 && color[i].RGB63_green_index_temp==0 && color[i].RGB63_blue_index_temp==2) color[i].index_temp=13;
+		if(color[i].RGB63_red_index_temp==2 && color[i].RGB63_green_index_temp==2 && color[i].RGB63_blue_index_temp==0) color[i].index_temp=14;
+		if(color[i].RGB63_red_index_temp==2 && color[i].RGB63_green_index_temp==2 && color[i].RGB63_blue_index_temp==2) color[i].index_temp=15;
+
+		// write new ASM Hex Color Code to color adress //////////////
+
+		color[i].new_color=(color[i].index_temp)*4096+(color[i].red_temp)*256+(color[i].green_temp)*16+(color[i].blue_temp);
+		volMEMWORD(4194304+(i*2)+(palette_no*32)) = color[i].new_color;
+	}
+}
+
 long millis = 0;
 long startframe = 0;
 int texto = 0;
@@ -163,7 +422,6 @@ else {
 
 }
 
-	backgroundColor(0xffff); //BG color
 	LSPCmode=0x1c00;	//autoanim speed
 
 	clearFixLayer();
@@ -190,8 +448,6 @@ else {
 	volMEMWORD(0x400002)=0xcccc; // black
 	volMEMWORD(0x400004)=0x9999; // black
 	volMEMWORD(0x400006)=0x2222; // black
-
-
 
 	SCClose();
 
@@ -405,16 +661,19 @@ void demopart_phone() {
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
-	scrollerInit(&frontScroll, &map, 1, 16, x, y);
-	palJobPut(16, map_Palettes.palCount, map_Palettes.data);
+	scrollerInit(&frontScroll, &map, 1, 1, x, y);
+						palJobPut(1, map_Palettes.palCount, map_Palettes.data);
 
-	scrollerInit(&errorScroll, &title, 100, 16+16+16+16+16, 0, 0);
-	palJobPut(16+16+16+16+16, title_Palettes.palCount, title_Palettes.data);
+	scrollerInit(&errorScroll, &title, 100, 5, 0, 0);
+	palJobPut(5, title_Palettes.palCount, title_Palettes.data);
+	SCClose();
 
-	scrollerInit(&layerbgScroll, &dovbg, 150, 16+16+16, 0, 45);
-	palJobPut(16+16+16, dovbg_Palettes.palCount, dovbg_Palettes.data);
-	scrollerInit(&layerfrScroll, &dov, 200, 16+16+16+16, 0, 4);
-	palJobPut(16+16+16+16, dov_Palettes.palCount, dov_Palettes.data);
+	prepare_fade_in();
+
+	scrollerInit(&layerbgScroll, &dovbg, 150, 20, 0, 45);
+	palJobPut(20, dovbg_Palettes.palCount, dovbg_Palettes.data);
+	scrollerInit(&layerfrScroll, &dov, 200, 30, 0, 4);
+	palJobPut(30, dov_Palettes.palCount, dov_Palettes.data);
 
 
 	pictureInit(&cursorPic,&cursor,232,200,50,128,FLIP_NONE);
@@ -505,19 +764,22 @@ void demopart_phone() {
 		if (t2>3) scrollerSetPos(&layerbgScroll, 0, t2+42);
 		if (t2>3) scrollerSetPos(&layerfrScroll, 0, -1+t2+(sintab[(t3*7)%1023]>>5));
 		
-		if (t3>3 && t3 < 550) scrollerSetPos(&errorScroll, 0, ((256-t3/2) < 0 ? 0 : (256-t3/2)) +(sintab[(t3*7)%1023]>>5)-4);
+		if (t3>3 && t3 < 550) scrollerSetPos(&errorScroll, 0, 310+t2 +(sintab[(t3*7)%1023]>>5)-4);
 		else if (t3>=550 && t3 < 800) scrollerSetPos(&errorScroll, 0, (sintab[(t3*7)%1023]>>5)-4);
 		else if (t3 >= 800 && t3 < 890) scrollerSetPos(&errorScroll, 0-(t3-800)*3, (sintab[(t3*7)%1023]>>5)-4);
 
-		if (t3>=550 && t<800) {
+		if (t3>=500 && t<800) {
 
-			if (blinkcnt == 32) pictureHide(&cursorPic); 
+			fade_in();
 
-			if (blinkcnt > 64) blinkcnt = 0;
-			if (blinkcnt == 0) pictureShow(&cursorPic);
+			if (t3 > 550) {
+				if (blinkcnt == 32) pictureHide(&cursorPic); 
 
-			if (blinkcnt < 32) pictureSetPos(&cursorPic,37,128-(sintab[(t3*7)%1023]>>5)+3);
+				if (blinkcnt > 64) blinkcnt = 0;
+				if (blinkcnt == 0) pictureShow(&cursorPic);
 
+				if (blinkcnt < 32) pictureSetPos(&cursorPic,37,128-(sintab[(t3*7)%1023]>>5)+3);
+			}
 		}
 		if (t3 >= 800) {
 			pictureHide(&cursorPic);
@@ -526,9 +788,11 @@ void demopart_phone() {
 		lp2 = -180+(t-600)+(sintab[(t3*4)%1023]>>5);
 		if (lp2 >= -20) lp2 = -20;
 		if (t > 599 && initf == 0) {
+
 			scrollerInit(&layer2Scroll, &kaverit, 262+1, 16+16, 0, -224);
 			palJobPut(16+16, kaverit_Palettes.palCount, kaverit_Palettes.data);
 			initf = 1;
+
 		}
 		if (t > 600) scrollerSetPos(&layer2Scroll, 0, lp2);
 		if (t > 850) scrollerSetPos(&layer2Scroll, 0, lp2+(850-t));
@@ -828,17 +1092,17 @@ void demopart_meta() {
 		if(p1&JOY_LEFT)	scrollx--;
 		if(p1&JOY_RIGHT) scrollx++;
 
-		t3 = DAT_frameCounter+DAT_droppedFrames-startframe;
+		t3 = DAT_frameCounter-startframe;
 
 		y=sintab[(t3 << SHIFT_AMOUNT) & 1023] << SHIFT_AMOUNT-2;
-		//x += (y+(x2*1000)) >> (SHIFT_AMOUNT+7);
-		x+=4;
+		x += (y+(x2*1000)) >> (SHIFT_AMOUNT+7);
+		//x+=4;
 		x2 += y >> (SHIFT_AMOUNT);
 
 		if (x>=4864-320) { 	
-			xx+=4;	
+			//xx+=4;	
 			x = 4864-320;
-			//xx += (y+(x2*1000)) >> (SHIFT_AMOUNT+7);
+			xx += (y+(x2*1000)) >> (SHIFT_AMOUNT+7);
 		}
 
 		millis = t3/(2); 
@@ -883,6 +1147,7 @@ void demopart_kiss() {
 	int xx=0;
 	int x2=0;
 	int y=0;
+	int reps=0;
 	int t;
 	int t2;
 	int t3=0;
@@ -906,7 +1171,6 @@ void demopart_kiss() {
 	ushort *dataPtr;
 	short displayedRasters;
 
-	scroller frontScroll;
 	scroller c1;
 	scroller c2;
 
@@ -924,14 +1188,14 @@ void demopart_kiss() {
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
-	scrollerInit(&frontScroll, &kiss, 1, 16, x, y);
-	palJobPut(16, kiss_Palettes.palCount, kiss_Palettes.data);
+	scrollerInit(&kissScroll, &kiss, 1, 1, x, y);
+	palJobPut(1, kiss_Palettes.palCount, kiss_Palettes.data);
 
-	scrollerInit(&c1, &credits1, 1+205, 16+16, 0, -256);
-	palJobPut(16+16, credits1_Palettes.palCount, credits1_Palettes.data);
+	scrollerInit(&c1, &credits1, 1+205, 3, 0, -256);
+	palJobPut(3, credits1_Palettes.palCount, credits1_Palettes.data);
 
-	scrollerInit(&c2, &credits2, 1+205+32, 16+16+16, 0, -256);
-	palJobPut(16+16+16, credits2_Palettes.palCount, credits2_Palettes.data);
+	scrollerInit(&c2, &credits2, 1+205+32, 5, 0, -256);
+	palJobPut(5, credits2_Palettes.palCount, credits2_Palettes.data);
 
 	volMEMWORD(0x400004)=0xeeee; // white
 	volMEMWORD(0x400002)=0x4444; // black
@@ -977,13 +1241,15 @@ void demopart_kiss() {
 		t3 = DAT_frameCounter-startframe;
 		t2 = DAT_frameCounter-startframe-y;
 
+		if (reps < 255){
 		if (lp2 == 0) {
 			if (t2/4 > 0 && x < 38*256) x = ((t2/4)%39) *256;
-			if (t2/4 > 39*3) { x = ((t2/4)%39) *256; xx = 9984 - x; if (xx <=256) {y = t2+250; xx = 0; x=0; } }
+			if (t2/4 > 39*3) { x = ((t2/4)%39) *256; xx = 9984 - x; if (xx <=256) {y = t2+250; xx = 0; x=0; } reps++; }
 
-		if (xx == 0) scrollerSetPos(&frontScroll, 0, x);
-			else if (xx > 0) scrollerSetPos(&frontScroll, 0, xx);
+		if (xx == 0) scrollerSetPos(&kissScroll, 0, x);
+			else if (xx > 0) scrollerSetPos(&kissScroll, 0, xx);
 
+		}
 		}
 
 		if (t3 < 680*2) 
@@ -1015,9 +1281,15 @@ void demopart_kiss() {
 	}
 
 	SCClose();
+	fade_out();
+	waitVBlank();
+	SCClose();
+	waitVBlank();
 
 	clearSprites(1, 512);
+	SCClose();
 	waitVBlank();
+
 
 }
 
@@ -1340,7 +1612,6 @@ void demopart_letter2() {
 	text[6] = " Those will never go ";
 	text[7] = "away. Will never die.";
 
-	backgroundColor(0xffff); //BG color
 	LSPCmode=0x1c00;	//autoanim speed
 
 	clearFixLayer();
