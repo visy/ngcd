@@ -542,7 +542,7 @@ else {
 			
 		jobMeterColor(JOB_BLUE);
 
-		scrollerSetPos(&frontScroll, sintab[t*3 % 1023]>>3, 0);
+		scrollerSetPos(&frontScroll, sintab[t*5 % 1023]>>3, -2-ly/7);
 		scrollerSetPos(&backScroll, backX, backY);
 		scrollerSetPos(&letterScroll, lx+8, ly);
 
@@ -695,7 +695,7 @@ void demopart_phone() {
 		waitVBlank();
 			blinkcnt++;
 
-		if (t>820) break;
+		if (t>800) break;
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
 		jobMeterColor(JOB_PURPLE);
@@ -956,9 +956,9 @@ void demopart_sakura() {
 		}
 		if (scrolly >= 200 << SHIFT_AMOUNT) scrollx = ((scrolly-(200 << SHIFT_AMOUNT)) >> SHIFT_AMOUNT+5);
 		if (scrollx > 48) scrollx = 48;
-		scrollerSetPos(&layerfg1Scroll,-32-scrollx,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
+//		scrollerSetPos(&layerfg1Scroll,-32-scrollx,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
 //		scrollerSetPos(&layerfg2Scroll,48+scrollx*0.5,50+(scrolly*3 >> (SHIFT_AMOUNT+2)));
-//		scrollerSetPos(&layerfg1Scroll,-32,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
+		if (t < 840) scrollerSetPos(&layerfg1Scroll,-8-t/5,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
 	
 
 //		if (t > 30 && t < 330*2) scrollerSetPos(&layerbgScroll,0,(t-30)/2);
