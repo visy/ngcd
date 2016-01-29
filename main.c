@@ -603,7 +603,7 @@ void demopart_phone() {
 	int t2;
 	int t3=0;
 	int fixed;
-	int tox = 5;
+	int tox = 8;
 	int toy = 9;
 	int ee = 0;
 	int lx=0;
@@ -723,7 +723,7 @@ void demopart_phone() {
 		y=t3+(sintab[t3*3 % 1023]>>2);
 
 		if (y<=0) y = 0;
-		if (x>=2272) { x = 2272; x2=(t3*2)-x;  }
+		if (x>=2272) { x = 2272; x2=(t3*2)-x+6;  }
 		if (y>=1644-64) { y = 1644-64; } 
 
 		millis = t3/(2); 
@@ -735,13 +735,15 @@ void demopart_phone() {
 				backgroundColor(0xffff);
 
 	volMEMWORD(0x400000)=0x8000; // black
-	volMEMWORD(0x400002)=0xffff; // black
-	volMEMWORD(0x400004)=0xffff; // black
-	volMEMWORD(0x400006)=0xffff; // black
+	volMEMWORD(0x400008)=0xf89F +(t3/1); // black
+	volMEMWORD(0x400006)=(0xa5fe +(t3/1)); // black
+	volMEMWORD(0x400002)=0xb5fE +(t3/1); // black
+	volMEMWORD(0x400004)=0xa4fE +(t3/1);  // black
 				ly = -15;
 				if (tl < 9) {
+					int gg = (sintab[(t3*100) & 1023] >> 8);
 					if (text[tl+offer][lt] == '1') { ml = 50; continue; }
-					if (text[tl+offer][lt] != '0') fixPrintf(tox+5+lt,toy+tl*2+ee,0,0,"%c%c%c",text[tl+offer][lt],text[tl+offer][lt+1],text[tl+offer][lt+2]);
+					if (text[tl+offer][lt] != '0' && text[tl+offer][lt] != ' ') fixPrintf(tox+5+lt,toy+tl*2+ee,0,0,"%c%c%c",text[tl+offer][lt]+63+gg,text[tl+offer][lt+1]+63+gg,text[tl+offer][lt+2]+63+gg);
 					lt+=2;
 					if (lt >= strlen(text[tl+offer])) { 
 						lt = 0; tl++;
@@ -859,11 +861,11 @@ void demopart_sakura() {
 	pictureInfo* cur;
 	paletteInfo* curpal;
 		const char *text[5];
-	text[0] = " <NARRATOR>                ";
+	text[0] = " \x8cnarrator\x8d                 ";
 	text[1] = " ";
-	text[2] = " Here's where I've always hidden away ";
+	text[2] = " here's where i've always hidden away ";
 	text[3] = " when my mind needs true tranquility, ";
-	text[4] = " peace, and quiet... my Zen garden... ";
+	text[4] = " peace, and quiet... my zen garden... ";
 
 	backgroundColor(0xffff); //BG color
 	LSPCmode=0x1c00;	//autoanim speed
@@ -884,9 +886,10 @@ void demopart_sakura() {
 //	palJobPut(16+16+16, cherries_a_Palettes.palCount, cherries_a_Palettes.data);
 
 	volMEMWORD(0x400000)=0x8000; // black
-	volMEMWORD(0x400006)=0xffff; // black
-	volMEMWORD(0x400002)=0x3028; // black
-	volMEMWORD(0x400004)=0x254b; // black
+	volMEMWORD(0x400008)=0x889F; // black
+	volMEMWORD(0x400006)=0x063E ; // black
+	volMEMWORD(0x400002)=0x053E ; // black
+	volMEMWORD(0x400004)=0x043E;  // black
 
 //	volMEMWORD(0x400002)=0xcccc; // black
 //	volMEMWORD(0x400004)=0x9999; // black
@@ -918,13 +921,13 @@ void demopart_sakura() {
 		if (t2 < 0) t2 = 0;
 		if (once !=2) once = 0;
 
-		if (t >= 400-6 && loaded == 0) {
+		if (t >= 380-6 && loaded == 0) {
 			loaded = 1;
 			scrollerInit(&animScroll, &sakura, 1+32+32, 16+16+16, 0,0);
 			palJobPut(16+16+16, sakura_Palettes.palCount, sakura_Palettes.data);
 		}
 
-		if (t > 400-6 && t < 559-6) {
+		if (t > 380-6 && t < 539-2) {
 			once = 1;
 			yy++;
 			if (yy > 5) {
@@ -935,7 +938,7 @@ void demopart_sakura() {
 			}
 		}
 
-		if (once != 2 && t >= 559-6) {
+		if (once != 2 && t >= 539-6) {
 			once = 2;
 			clearSprites(1+32+32,100);
 			scrollerInit(&textboxScroll, &textbox, 1+32+32+32, 16+16+16+16+16, 0,-224);
@@ -958,7 +961,7 @@ void demopart_sakura() {
 		if (scrollx > 48) scrollx = 48;
 //		scrollerSetPos(&layerfg1Scroll,-32-scrollx,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
 //		scrollerSetPos(&layerfg2Scroll,48+scrollx*0.5,50+(scrolly*3 >> (SHIFT_AMOUNT+2)));
-		if (t < 840) scrollerSetPos(&layerfg1Scroll,-8-t/5,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
+		if (t < 780) scrollerSetPos(&layerfg1Scroll,-8-t/5,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
 	
 
 //		if (t > 30 && t < 330*2) scrollerSetPos(&layerbgScroll,0,(t-30)/2);
@@ -970,8 +973,12 @@ void demopart_sakura() {
 		scrollerSetPos(&textboxScroll,0,-224+((t-600)));
 
 		if (t >= 680) {
+
+					// 26
+					// 63
 				if (tl < 5) {
-					if (text[tl][lt] != '0') fixPrintf(tox+lt+1,toy+tl*1+ee,0,0,"%c",text[tl][lt]);
+					if (text[tl][lt] == '.' || text[tl][lt] == ',' || text[tl][lt] == '\'') fixPrintf(tox+lt+1,toy+tl*1+ee,0,0,"%c",text[tl][lt]);
+					else if (text[tl][lt] != '0' && text[tl][lt] != ' ') fixPrintf(tox+lt+1,toy+tl*1+ee,0,0,"%c",text[tl][lt]+63);
 					lt2++;
 					if (lt2>1) {lt++; lt2=0;}
 					if (tl<6) { 
@@ -1194,8 +1201,8 @@ void demopart_kiss() {
 	scrollerInit(&c1, &credits1, 1+205, 3, 0, -256);
 	palJobPut(3, credits1_Palettes.palCount, credits1_Palettes.data);
 
-	scrollerInit(&c2, &credits2, 1+205+32, 5, 0, -256);
-	palJobPut(5, credits2_Palettes.palCount, credits2_Palettes.data);
+	scrollerInit(&c2, &credits2, 1+205+32, 8, 0, -256);
+	palJobPut(8, credits2_Palettes.palCount, credits2_Palettes.data);
 
 	volMEMWORD(0x400004)=0xeeee; // white
 	volMEMWORD(0x400002)=0x4444; // black
