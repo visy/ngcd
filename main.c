@@ -592,6 +592,7 @@ void demopart_phone() {
 	int lt = 0;
 	int initf = 0;
 	int blinkcnt = 0;
+	int titleLoaded = 0;
 	int lt2 = 0;
 	int clearflag = 1;
 	int tl = 0;
@@ -628,7 +629,8 @@ void demopart_phone() {
 	scroller layerbgScroll;
 	scroller layerfrScroll;
 	scroller layer2Scroll;
-	scroller errorScroll;
+	scroller titleScroll;
+	scroller bootScroll;
 	picture cursorPic;
 
 	picture dovrot;
@@ -662,10 +664,13 @@ void demopart_phone() {
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
 	scrollerInit(&frontScroll, &map, 1, 1, x, y);
-						palJobPut(1, map_Palettes.palCount, map_Palettes.data);
+	palJobPut(1, map_Palettes.palCount, map_Palettes.data);
 
-	scrollerInit(&errorScroll, &title, 100, 5, 0, 0);
+	scrollerInit(&bootScroll, &emugeo, 100, 3, 0, 0);
+	palJobPut(3, emugeo_Palettes.palCount, emugeo_Palettes.data);
+
 	palJobPut(5, title_Palettes.palCount, title_Palettes.data);
+
 	SCClose();
 
 	prepare_fade_in();
@@ -766,9 +771,12 @@ void demopart_phone() {
 		if (t2>3) scrollerSetPos(&layerbgScroll, 0, t2+42);
 		if (t2>3) scrollerSetPos(&layerfrScroll, 0, -1+t2+(sintab[(t3*7)%1023]>>5));
 		
-		if (t3>3 && t3 < 550) scrollerSetPos(&errorScroll, 0, 310+t2 +(sintab[(t3*7)%1023]>>5)-4);
-		else if (t3>=550 && t3 < 800) scrollerSetPos(&errorScroll, 0, (sintab[(t3*7)%1023]>>5)-4);
-		else if (t3 >= 800 && t3 < 890) scrollerSetPos(&errorScroll, 0-(t3-800)*3, (sintab[(t3*7)%1023]>>5)-4);
+		if (t3>3 && t3 < 550) scrollerSetPos(&bootScroll, 0, 310+t2 +(sintab[(t3*7)%1023]>>5)-4);
+		else if (t3>=550 && t3 < 800) scrollerSetPos(&bootScroll, 0, (sintab[(t3*7)%1023]>>5)-4);
+		else if (t3 >= 800 && t3 < 890) scrollerSetPos(&titleScroll, 0-(t3-800)*3, (sintab[(t3*7)%1023]>>5)-4);
+
+		if (t3 > 478 && titleLoaded == 0) { scrollerInit(&titleScroll, &title, 100, 5, 0, 0); titleLoaded = 1; }
+
 
 		if (t3>=500 && t<800) {
 

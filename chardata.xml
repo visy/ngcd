@@ -74,6 +74,9 @@
   <scrl id="title">
     <file>gfx\title2.png</file>
   </scrl>
+  <scrl id="emugeo">
+    <file>gfx\emugeo2.png</file>
+  </scrl>
   <scrl id="map">
     <file>gfx\map.png</file>
   </scrl>
@@ -84,7 +87,7 @@
     <file>gfx\devicebg2.png</file>
   </scrl>
   <scrl id="dov">
-    <file>gfx\deviceover2.png</file>
+    <file>gfx\deviceover3.png</file>
   </scrl>
   <scrl id="kaverit">
     <file>gfx\kaverit.png</file>
