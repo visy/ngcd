@@ -677,7 +677,7 @@ void demopart_phone() {
 
 	scrollerInit(&layerbgScroll, &dovbg, 150, 20, 0, 45);
 	palJobPut(20, dovbg_Palettes.palCount, dovbg_Palettes.data);
-	scrollerInit(&layerfrScroll, &dov, 200, 30, 0, 4);
+	scrollerInit(&layerfrScroll, &dov, 190, 30, 0, 4);
 	palJobPut(30, dov_Palettes.palCount, dov_Palettes.data);
 
 
@@ -795,12 +795,12 @@ void demopart_phone() {
 			pictureHide(&cursorPic);
 		}
 
-		lp2 = -180+(t-600)+(sintab[(t3*4)%1023]>>5);
+		lp2 = -190+(t-600)+(sintab[(t3*4)%1023]>>5);
 		if (lp2 >= -20) lp2 = -20;
 		if (t > 599 && initf == 0) {
 
-			scrollerInit(&layer2Scroll, &kaverit, 262+1, 16+16, 0, -224);
-			palJobPut(16+16, kaverit_Palettes.palCount, kaverit_Palettes.data);
+			scrollerInit(&layer2Scroll, &kaverit, 262+1, 3, 0, lp2);
+			palJobPut(3, kaverit_Palettes.palCount, kaverit_Palettes.data);
 			initf = 1;
 
 		}
