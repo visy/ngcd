@@ -317,6 +317,8 @@ int targetframe = 1705;
 int firstframe = 1700;
 int traend = 0;
 int tradir = 0;
+int trafont = 0;
+int tracolor = 0x0000;
 
 void draw_transition() {
 	int t = DAT_frameCounter-trastart;
@@ -336,8 +338,18 @@ void draw_transition() {
 					fixPrintf(0,y,0,0,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea);
 			}
 			targetframe = t + 1;
+			if (trafont == 0) {
+				trafont = 1;
+				volMEMWORD(0x400000)=tracolor; // black
+				volMEMWORD(0x400002)=tracolor; // black
+				volMEMWORD(0x400004)=tracolor; // black
+				volMEMWORD(0x400006)=tracolor; // black
+				volMEMWORD(0x400008)=tracolor; // black
+				volMEMWORD(0x40000a)=tracolor; // black
+			}
 		}
 		else if (t >= targetframe && traframe > 0)  {
+			trafont = 0;
 			traframe++; 
 			traframea = traframe;
 			if (tradir == 1) { traframea = 15-traframe; if (traframea == 0) traframea = 255;}
@@ -890,11 +902,11 @@ void demopart_sakura() {
 	scrollerInit(&layerfg1Scroll, &cherries_b, 1+32, 16+16, 0,0);
 	palJobPut(16+16, cherries_b_Palettes.palCount, cherries_b_Palettes.data);
 
-//	scrollerInit(&layerfg2Scroll, &cherries_a, 1+32+32, 16+16+16, 0,0);
-//	palJobPut(16+16+16, cherries_a_Palettes.palCount, cherries_a_Palettes.data);
+	scrollerInit(&layerfg2Scroll, &cherries_a, 1+32+128, 16+16+64, 0,0);
+	palJobPut(16+16+64, cherries_a_Palettes.palCount, cherries_a_Palettes.data);
 
 	volMEMWORD(0x400000)=0x8000; // black
-	volMEMWORD(0x400008)=0x889F; // black
+	volMEMWORD(0x400008)=0xfffF; // black
 	volMEMWORD(0x400006)=0x063E ; // black
 	volMEMWORD(0x400002)=0x053E ; // black
 	volMEMWORD(0x400004)=0x043E;  // black
@@ -924,6 +936,8 @@ void demopart_sakura() {
 		jobMeterColor(JOB_BLUE);
 
 		if (t > 900) break;
+
+		draw_transition();
 
 		t2 = (DAT_frameCounter-startframe-yy)/2;
 		if (t2 < 0) t2 = 0;
@@ -967,9 +981,9 @@ void demopart_sakura() {
 		}
 		if (scrolly >= 200 << SHIFT_AMOUNT) scrollx = ((scrolly-(200 << SHIFT_AMOUNT)) >> SHIFT_AMOUNT+5);
 		if (scrollx > 48) scrollx = 48;
-//		scrollerSetPos(&layerfg1Scroll,-32-scrollx,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
-//		scrollerSetPos(&layerfg2Scroll,48+scrollx*0.5,50+(scrolly*3 >> (SHIFT_AMOUNT+2)));
-		if (t < 780) scrollerSetPos(&layerfg1Scroll,-8-t/5,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
+		scrollerSetPos(&layerfg1Scroll,-32-scrollx,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
+		scrollerSetPos(&layerfg2Scroll,48+scrollx*0.5,50+(scrolly*3 >> (SHIFT_AMOUNT+2)));
+//		if (t < 780) scrollerSetPos(&layerfg1Scroll,-8-t/5,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
 	
 
 //		if (t > 30 && t < 330*2) scrollerSetPos(&layerbgScroll,0,(t-30)/2);
@@ -1058,16 +1072,15 @@ void demopart_meta() {
 	backgroundColor(0x0000); //BG color
 	LSPCmode=0x1c00;	//autoanim speed
 
-	clearFixLayer();
 	initGfx();
 	jobMeterSetup(true);
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
-	scrollerInit(&frontScroll, &meta, 1, 16, x, y);
-	palJobPut(16, meta_Palettes.palCount, meta_Palettes.data);
-	scrollerInit(&frontScroll2, &bs, 1+32, 16+16, 0, y);
-	palJobPut(16+16, bs_Palettes.palCount, bs_Palettes.data);
+	scrollerInit(&frontScroll, &meta, 1, 1, x, y);
+	palJobPut(1, meta_Palettes.palCount, meta_Palettes.data);
+	scrollerInit(&frontScroll2, &bs, 90, 120, 0, y);
+	palJobPut(120, bs_Palettes.palCount, bs_Palettes.data);
 
 
 	volMEMWORD(0x400004)=0xeeee; // white
@@ -1086,10 +1099,12 @@ void demopart_meta() {
 		// BIOSF_SYSTEM_IO
 
 		waitVBlank();
-		if (t>1450) break;
+		if (t>1400) break;
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
 		jobMeterColor(JOB_PURPLE);
+
+		draw_transition();
 
 		p1=volMEMBYTE(P1_CURRENT);
 		p2=volMEMBYTE(P2_CURRENT);
@@ -1127,7 +1142,7 @@ void demopart_meta() {
 
 		scrollerSetPos(&frontScroll, x-xx, 0);
 
-		if ( t > 1000) {
+		if ( t > 900) {
 
 		y5=sintab[(x5 >> SHIFT_AMOUNT+8) & 1023] << SHIFT_AMOUNT-2;
 		x5 += (x6*500) >> (SHIFT_AMOUNT+7);
@@ -1206,10 +1221,10 @@ void demopart_kiss() {
 	scrollerInit(&kissScroll, &kiss, 1, 1, x, y);
 	palJobPut(1, kiss_Palettes.palCount, kiss_Palettes.data);
 
-	scrollerInit(&c1, &credits1, 1+205, 3, 0, -256);
+	scrollerInit(&c1, &credits1, 1+205, 3, 0, 0);
 	palJobPut(3, credits1_Palettes.palCount, credits1_Palettes.data);
 
-	scrollerInit(&c2, &credits2, 1+205+32, 8, 0, -256);
+	scrollerInit(&c2, &credits2, 1+205+64, 8, 0, 0);
 	palJobPut(8, credits2_Palettes.palCount, credits2_Palettes.data);
 
 	volMEMWORD(0x400004)=0xeeee; // white
@@ -1267,10 +1282,10 @@ void demopart_kiss() {
 		}
 		}
 
-		if (t3 < 680*2) 
-		scrollerSetPos(&c1,-4,-240+t3/1.7);
-		if (t3 < 770*2) 
-		scrollerSetPos(&c2,4,-240+t3/1.62);
+		if (t3 < 680*2.5) 
+		scrollerSetPos(&c1,-4,t3/1.7);
+		if (t3 < 770*2.5) 
+		scrollerSetPos(&c2,4,t3/1.45);
 
 		if (t3 > 740*2) break;
 
@@ -1884,6 +1899,14 @@ void startDemologic() {
 	demopart_letter();
 
 	demopart_phone();
+
+	texto = 1;
+	trastart = 0;
+	traframe = 0;
+	targetframe = 1780;
+	firstframe = 1775;
+	traend = 0;
+	tradir = 0;
 
 	demopart_sakura();
 

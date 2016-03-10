@@ -66,6 +66,9 @@
   <scrl id="sakura">
  	<file>gfx\sakura.png</file>
   </scrl>
+  <scrl id="sakura2">
+ 	<file>gfx\sakura2.png</file>
+  </scrl>
 
   <pict id="cursor">
     <file>gfx\cursor.png</file>
@@ -81,7 +84,7 @@
     <file>gfx\map.png</file>
   </scrl>
   <scrl id="meta">
-    <file>gfx\meta.png</file>
+    <file>gfx\meta5.png</file>
   </scrl>
   <scrl id="dovbg">
     <file>gfx\devicebg2.png</file>
@@ -140,7 +143,7 @@
     <file>gfx\ttbg_a.png</file>
   </scrl>
   <scrl id="ttbg_b">
-    <file>gfx\ttbg_b2.png</file>
+    <file>gfx\ttbg_b.png</file>
   </scrl>
   <scrl id="ttbg_c">
     <file>gfx\ttbg_c.png</file>
