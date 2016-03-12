@@ -318,12 +318,14 @@ int firstframe = 1700;
 int traend = 0;
 int tradir = 0;
 int trafont = 0;
+int trastyle = 0;
 int tracolor = 0x0000;
 
 void draw_transition() {
 	int t = DAT_frameCounter-trastart;
 	int i = 0;
 	int x;
+	int act;
 	int y;
 	int traframea;
 	if (traend == 2) return;
@@ -334,8 +336,9 @@ void draw_transition() {
 			traframe++;
 			traframea = traframe;
 			if (tradir == 1) traframea = 16-traframe;
+			act = traframea+(224*trastyle);
 			for (y = 0;y<30;y++) {
-					fixPrintf(0,y,0,0,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea);
+					fixPrintf(0,y,0,0,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act);
 			}
 			targetframe = t + 1;
 			if (trafont == 0) {
@@ -353,8 +356,12 @@ void draw_transition() {
 			traframe++; 
 			traframea = traframe;
 			if (tradir == 1) { traframea = 15-traframe; if (traframea == 0) traframea = 255;}
+
+			if (traframea != 255) act = traframea+(224*trastyle);
+			else act = 255;
+
 			for (y = 0;y<30;y++) {
-					fixPrintf(0,y,0,0,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea,traframea);
+					fixPrintf(0,y,0,0,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act);
 			}
 			targetframe = t + 1;
 		}
@@ -747,15 +754,16 @@ void demopart_phone() {
 		t = millis;
 			
 		jobMeterColor(JOB_BLUE);
-
+			if (t >= 600) {
+				volMEMWORD(0x400000)=0x8000; // black
+				volMEMWORD(0x400002)=0xf89F +(t3/1); // black
+				volMEMWORD(0x400004)=(0xa5fe +(t3/1)); // black
+				volMEMWORD(0x400006)=0xb5fE +(t3/1); // black
+				volMEMWORD(0x400008)=0xa4fE +(t3/1);  // black
+			}
 			if (t >= 600 && t < 800 && ml < 15) { 
 				backgroundColor(0xffff);
 
-	volMEMWORD(0x400000)=0x8000; // black
-	volMEMWORD(0x400008)=0xf89F +(t3/1); // black
-	volMEMWORD(0x400006)=(0xa5fe +(t3/1)); // black
-	volMEMWORD(0x400002)=0xb5fE +(t3/1); // black
-	volMEMWORD(0x400004)=0xa4fE +(t3/1);  // black
 				ly = -15;
 				if (tl < 9) {
 					int gg = (sintab[(t3*100) & 1023] >> 8);
@@ -892,22 +900,21 @@ void demopart_sakura() {
 
 	clearFixLayer();
 	initGfx();
-	jobMeterSetup(true);
+	jobMeterSetup(false);
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
-	scrollerInit(&layerbgScroll, &cherries, 1, 16, 0, 0);
-	palJobPut(16, cherries_Palettes.palCount, cherries_Palettes.data);
+	scrollerInit(&layerbgScroll, &cherries, 10, 226, 0, 0);
+	palJobPut(226, cherries_Palettes.palCount, cherries_Palettes.data);
 
-	scrollerInit(&layerfg1Scroll, &cherries_b, 1+32, 16+16, 0,0);
+	scrollerInit(&layerfg1Scroll, &cherries_b, 10+32, 16+16, 0,0);
 	palJobPut(16+16, cherries_b_Palettes.palCount, cherries_b_Palettes.data);
 
-	scrollerInit(&layerfg2Scroll, &cherries_a, 1+32+128, 16+16+64, 0,0);
+	scrollerInit(&layerfg2Scroll, &cherries_a, 10+32+128, 16+16+64, 0,0);
 	palJobPut(16+16+64, cherries_a_Palettes.palCount, cherries_a_Palettes.data);
 
-	volMEMWORD(0x400000)=0x8000; // black
-	volMEMWORD(0x400008)=0xfffF; // black
-	volMEMWORD(0x400006)=0x063E ; // black
+	volMEMWORD(0x400006)=0xffff; // black
+
 	volMEMWORD(0x400002)=0x053E ; // black
 	volMEMWORD(0x400004)=0x043E;  // black
 
@@ -1905,20 +1912,25 @@ void startDemologic() {
 	asm("jsr 0xC0056A");
 
 //	demopart_4k();
+	trastyle = 1;
 
 	demopart_letter();
+	trastyle = 0;
 
 	demopart_phone();
 
 	texto = 1;
 	trastart = 0;
 	traframe = 0;
+	trastyle = 0;
 	targetframe = 1780;
 	firstframe = 1775;
 	traend = 0;
 	tradir = 0;
 
 	demopart_sakura();
+
+	trastyle = 0;
 
 	demopart_meta();
 
@@ -1927,6 +1939,7 @@ void startDemologic() {
 	texto = 1;
 	trastart = 0;
 	traframe = 0;
+	trastyle = 1;
 	targetframe = 1705;
 	firstframe = 1700;
 	traend = 0;
