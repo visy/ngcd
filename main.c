@@ -1077,10 +1077,10 @@ void demopart_meta() {
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
-	scrollerInit(&frontScroll, &meta, 1, 1, x, y);
-	palJobPut(1, meta_Palettes.palCount, meta_Palettes.data);
-	scrollerInit(&frontScroll2, &bs, 90, 120, 0, y);
-	palJobPut(120, bs_Palettes.palCount, bs_Palettes.data);
+	scrollerInit(&frontScroll, &meta, 1, 10, x, y);
+	palJobPut(10, meta_Palettes.palCount, meta_Palettes.data);
+	scrollerInit(&frontScroll2, &bs, 90, 170, 0, y);
+	palJobPut(170, bs_Palettes.palCount, bs_Palettes.data);
 
 
 	volMEMWORD(0x400004)=0xeeee; // white
