@@ -1031,6 +1031,7 @@ void demopart_meta() {
 	int lt = 0;
 	int lt2 = 0;
 	int tl = 0;
+	int newx = 0;
 	int x=0;
 	int xx=0;
 	int x2=0;
@@ -1050,7 +1051,7 @@ void demopart_meta() {
 	int i,j;
 	int lp2 = 0;
 	int nexts = 0;
-	int scrollx=0;
+	int scrollx=6;
 	int scrolly=0;
 	int offer=0;
 	WORD raster=true;
@@ -1069,7 +1070,7 @@ void demopart_meta() {
 	pictureInfo* cur;
 	paletteInfo* curpal;
 
-	backgroundColor(0x0000); //BG color
+	backgroundColor(0xffff); //BG color
 	LSPCmode=0x1c00;	//autoanim speed
 
 	initGfx();
@@ -1101,6 +1102,11 @@ void demopart_meta() {
 		waitVBlank();
 		if (t>1400) break;
 
+		if (t>1340) {
+						clearSprites(1, (t-1340)*1);
+
+		}
+
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
 		jobMeterColor(JOB_PURPLE);
 
@@ -1119,28 +1125,35 @@ void demopart_meta() {
 
 		if(p1&JOY_UP)	scrolly--;
 		if(p1&JOY_DOWN)	scrolly++;
-		if(p1&JOY_LEFT)	scrollx--;
-		if(p1&JOY_RIGHT) scrollx++;
+//		if(p1&JOY_LEFT)	scrollx--;
+//		if(p1&JOY_RIGHT) scrollx++;
 
 		t3 = DAT_frameCounter-startframe;
+
+		scrollx+=1;
 
 		y=sintab[(t3 << SHIFT_AMOUNT) & 1023] << SHIFT_AMOUNT-2;
 		x += (y+(x2*1000)) >> (SHIFT_AMOUNT+7);
 		//x+=4;
 		x2 += y >> (SHIFT_AMOUNT);
 
-		if (x>=4864-320) { 	
-			//xx+=4;	
-			x = 4864-320;
-			xx += (y+(x2*1000)) >> (SHIFT_AMOUNT+7);
-		}
-
 		millis = t3/(2); 
 		t = millis;
 			
 		jobMeterColor(JOB_BLUE);
 
-		scrollerSetPos(&frontScroll, x-xx, 0);
+
+
+		newx += scrollx>>5;
+
+
+		if ( (newx>>3) >= 4864-320 ) { 	
+			//xx+=4;	
+			newx = (4864-320)<<3;
+			xx += scrollx>>5;
+		}
+
+		scrollerSetPos(&frontScroll, (newx>>3)-(xx>>3), 0);
 
 		if ( t > 900) {
 
@@ -1214,31 +1227,29 @@ void demopart_kiss() {
 	clearFixLayer();
 
 	initGfx();
-	jobMeterSetup(true);
+	jobMeterSetup(false);
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
 	scrollerInit(&kissScroll, &kiss, 1, 1, x, y);
 	palJobPut(1, kiss_Palettes.palCount, kiss_Palettes.data);
 
-	scrollerInit(&c1, &credits1, 1+205, 3, 0, 0);
+	scrollerInit(&c1, &credits1, 1+205, 3, -4, 0);
 	palJobPut(3, credits1_Palettes.palCount, credits1_Palettes.data);
 
-	scrollerInit(&c2, &credits2, 1+205+64, 8, 0, 0);
+	scrollerInit(&c2, &credits2, 1+205+64, 8, 4, 0);
 	palJobPut(8, credits2_Palettes.palCount, credits2_Palettes.data);
 
 	volMEMWORD(0x400004)=0xeeee; // white
 	volMEMWORD(0x400002)=0x4444; // black
 
-		scrollerSetPos(&c1,-4,-240);
-		scrollerSetPos(&c2,4,-240);
+		scrollerSetPos(&c1,-4,0);
+		scrollerSetPos(&c2,4,0);
 
 	SCClose();
 
 	t = 0;
 	t2 = 0;
-
-		waitVBlank();
 
 		startframe = DAT_frameCounter+1;
 
@@ -1892,7 +1903,6 @@ void startDemologic() {
 	asm("clr.w %d0");
 	asm("move.w #0x0502,%d0");
 	asm("jsr 0xC0056A");
-
 
 //	demopart_4k();
 
