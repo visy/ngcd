@@ -918,7 +918,7 @@ void demopart_sakura() {
 //	volMEMWORD(0x400006)=0x2222; // black
 
 
-		scrollerSetPos(&layerfg1Scroll,-32-scrollx,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
+		scrollerSetPos(&layerfg1Scroll,-32-scrollx,0+(scrolly*2 >> (SHIFT_AMOUNT+2)));
 
 	SCClose();
 
@@ -981,7 +981,7 @@ void demopart_sakura() {
 		}
 		if (scrolly >= 200 << SHIFT_AMOUNT) scrollx = ((scrolly-(200 << SHIFT_AMOUNT)) >> SHIFT_AMOUNT+5);
 		if (scrollx > 48) scrollx = 48;
-		scrollerSetPos(&layerfg1Scroll,-32-scrollx,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
+		scrollerSetPos(&layerfg1Scroll,-32-scrollx,0+(scrolly*2 >> (SHIFT_AMOUNT+2)));
 		scrollerSetPos(&layerfg2Scroll,48+scrollx*0.5,50+(scrolly*3 >> (SHIFT_AMOUNT+2)));
 //		if (t < 780) scrollerSetPos(&layerfg1Scroll,-8-t/5,-40+(scrolly*2 >> (SHIFT_AMOUNT+2)));
 	
@@ -1249,6 +1249,11 @@ void demopart_kiss() {
 
 		if (t>1840) break;
 
+		for (i = 0; i < 10; i++) {
+
+		backgroundColor(0x77aa-(((t+i/2))>>5)); //BG color
+		}
+
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
 
 		p1=volMEMBYTE(P1_CURRENT);
@@ -1290,11 +1295,6 @@ void demopart_kiss() {
 
 		millis = t3/(2); 
 		t = millis;
-
-		for (i = 0; i < 10; i++) {
-
-		backgroundColor(0x77aa-(((t+i/2))>>5)); //BG color
-		}
 
 
 
