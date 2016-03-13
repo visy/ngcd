@@ -1814,8 +1814,11 @@ void demopart_4k() {
 	short visible=true;
 	WORD raster=true;
 	WORD tableShift=0;
+	short ss = 0;
 	ushort rasterData0[512];
 	ushort rasterData1[512];
+	ushort rasterData2[512];
+	ushort rasterData3[512];
 	ushort rasterAddr;
 	ushort *dataPtr;
 	short displayedRasters;
@@ -1826,7 +1829,6 @@ void demopart_4k() {
 	initGfx();
 	LSPCmode=0x1c00;
 	loadTIirq(TI_MODE_SINGLE_DATA);
-
 
 	scrollerInit(&frontScroll, &end, 64, 48, -16,0);
 	palJobPut(48, end_Palettes.palCount, end_Palettes.data);
@@ -1850,12 +1852,45 @@ void demopart_4k() {
 
 		scrollerSetPos(&frontScroll, 0, 0);
 
-		if (t3 > 200) {
+		if (t3 >= 50 && t3 <= 305) {
+		if (initted == 0) {	
+			initted = 1;
+			pictureInit(&scroll2, &endtext, 140, 32, 16, -160, FLIP_NONE);
+			palJobPut(32, endtext_Palettes.palCount, endtext_Palettes.data);
+		}
 
+		pictureSetPos(&scroll2,16,208+(scrolly-(t3-50))>>1);
+
+		TInextTable=(TInextTable==rasterData2)?rasterData3:rasterData2;
+		dataPtr=TInextTable;
+		rasterAddr=0x8000+scroll2.baseSprite;
+
+		TIbase=TI_ZERO+(scrolly>0?((384*scrolly)):0); //timing to first line
+
+		displayedRasters=(scroll2.info->tileHeight<<4)-(scrolly>=0?0:0-scrolly);
+		if(displayedRasters+scrolly>224) displayedRasters=224-scrolly;
+		if(displayedRasters<0) displayedRasters=0;
+
+		ss = t3-50;
+
+		i=(scrolly>=0)?0:0-scrolly;
+		for(j=0;j<displayedRasters;j++) {
+			*dataPtr++=rasterAddr;
+
+			if(!(j&0x1)) *dataPtr++= ss;
+			else *dataPtr++= ss;
+			i+=1;
+		}
+//			SC234Put(rasterAddr,scrollx<<7); //restore pos
+		*dataPtr++=0x0000;
+		*dataPtr++=0x0000;	//end
+
+		}
+
+		if (t3 > 305) {
+		pictureSetPos(&scroll2,16,scrolly);
 		pictureInit(&scroll, &endtext, 100, 16, scrollx, scrolly, FLIP_NONE);
 		palJobPut(16, endtext_Palettes.palCount, endtext_Palettes.data-1);
-		pictureInit(&scroll2, &endtext, 140, 32, 2, scrolly, FLIP_NONE);
-		palJobPut(32, endtext_Palettes.palCount, endtext_Palettes.data);
 
 		TInextTable=(TInextTable==rasterData0)?rasterData1:rasterData0;
 		dataPtr=TInextTable;
@@ -1902,7 +1937,6 @@ void startDemologic() {
 	asm("jsr 0xC0056A");
 
 	trastyle = 1;
-
 	demopart_letter();
 	trastyle = 0;
 
