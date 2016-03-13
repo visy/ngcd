@@ -483,6 +483,7 @@ else {
 		waitVBlank();
 
 		// init next frame of animation, and the palette for it
+
 //		pictureInit(&scroll, cur, 43, 16 + ttbg_a_Palettes.palCount + ttbg_b_Palettes.palCount, scrollx, scrolly, FLIP_NONE);
 //		palJobPut(16 + ttbg_a_Palettes.palCount + ttbg_b_Palettes.palCount, curpal->palCount, curpal->data);
 
@@ -1346,7 +1347,7 @@ void demopart_kiss() {
 
 	clearFixLayer();
 	initGfx();
-	jobMeterSetup(true);
+	rteggretertereterSetup(true);
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
@@ -1791,9 +1792,14 @@ void demopart_letter2() {
 void demopart_4k() {
 	int x=87;
 	int y=136;
+	int initted = 0;
 	int i=0;
 	int t =0;
+	int tt = 0;
+	int j = 0;
 	int t3=0;
+	int scrollx=-64;
+	int scrolly=-48;
 	int relX,relY;
 	short showdebug=false;
 	scroller frontScroll;
@@ -1806,43 +1812,36 @@ void demopart_4k() {
 	picture ptr,tleft,bright;
 	short way1=JOY_UP,way2=JOY_UP;
 	short visible=true;
+	WORD raster=true;
+	WORD tableShift=0;
+	ushort rasterData0[512];
+	ushort rasterData1[512];
+	ushort rasterAddr;
+	ushort *dataPtr;
+	short displayedRasters;
+
+	picture scroll;
+	picture scroll2;
 
 	initGfx();
+	LSPCmode=0x1c00;
+	loadTIirq(TI_MODE_SINGLE_DATA);
 
-	scrollerInit(&frontScroll, &fourk, 1, 32, 0, 0);
-	palJobPut(32, fourk_Palettes.palCount, fourk_Palettes.data);
 
+	scrollerInit(&frontScroll, &end, 64, 48, -16,0);
+	palJobPut(48, end_Palettes.palCount, end_Palettes.data);
+
+	rasterAddr=0x8400+scroll.baseSprite;
 	SCClose();
 
-	startframe = DAT_frameCounter+1;
+	startframe = DAT_frameCounter;
 
 	while(1) {
 		waitVBlank();
-	backgroundColor(0x0000+t*1); //BG color
 
 		p1=volMEMBYTE(P1_CURRENT);
-		p1e=volMEMBYTE(P1_EDGE);
-		p2=volMEMBYTE(P2_EDGE);
-		ps=volMEMBYTE(PS_CURRENT);
-
-		if((ps&P1_START)&&(ps&P2_START)) {
-			clearSprites(1, 150);
-			clearSprites(200, 3);
-			SCClose();
-			waitVBlank();
-			return;
-		}
-
-		if(p1&JOY_UP)	y--;
-		if(p1&JOY_DOWN)	y++;
-		if(p1&JOY_LEFT)	x--;
-		if(p1&JOY_RIGHT)	x++;
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-
-		//while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-//		sortSprites(&drawTable[1],sortSize);
-
 
 		t3 = DAT_frameCounter-startframe;
 
@@ -1851,10 +1850,42 @@ void demopart_4k() {
 
 		scrollerSetPos(&frontScroll, 0, 0);
 
+		if (t3 > 200) {
+
+		pictureInit(&scroll, &endtext, 100, 16, scrollx, scrolly, FLIP_NONE);
+		palJobPut(16, endtext_Palettes.palCount, endtext_Palettes.data-1);
+		pictureInit(&scroll2, &endtext, 140, 32, 2, scrolly, FLIP_NONE);
+		palJobPut(32, endtext_Palettes.palCount, endtext_Palettes.data);
+
+		TInextTable=(TInextTable==rasterData0)?rasterData1:rasterData0;
+		dataPtr=TInextTable;
+		rasterAddr=0x8400+scroll.baseSprite;
+
+		TIbase=TI_ZERO+(scrolly>0?((384*scrolly)):0); //timing to first line
+
+		displayedRasters=(scroll.info->tileHeight<<4)-(scrolly>=0?0:0-scrolly);
+		if(displayedRasters+scrolly>224) displayedRasters=224-scrolly;
+		if(displayedRasters<0) displayedRasters=0;
+
+		i=(scrolly>=0)?0:0-scrolly;
+		for(j=0;j<displayedRasters;j++) {
+			*dataPtr++=rasterAddr;
+
+			if(!(j&0x1))
+				*dataPtr++=-64+((scrollx+(sintab[(i+tableShift*5+scrolly/2)&1023]+32)))<<3;
+			else	*dataPtr++=-64+((scrollx+(sintab[(i+1+tableShift*5+scrolly/2)&1023]+31)))<<3;
+			i+=2;
+		}
+//			SC234Put(rasterAddr,scrollx<<7); //restore pos
+		*dataPtr++=0x0000;
+		*dataPtr++=0x0000;	//end
+		}
+
 		SCClose();
 
-				draw_transition();
+		draw_transition();
 
+		tableShift++;
 
 
 	}
@@ -1870,7 +1901,6 @@ void startDemologic() {
 	asm("move.w #0x0502,%d0");
 	asm("jsr 0xC0056A");
 
-//	demopart_4k();
 	trastyle = 1;
 
 	demopart_letter();
@@ -1906,7 +1936,7 @@ void startDemologic() {
 
 	demopart_letter2();
 
-	demopart_sprite();
+	demopart_4k();
 
 
 }
@@ -1914,4 +1944,5 @@ void startDemologic() {
 
 int main(void) {
 		startDemologic();		
+		return 0;
 }

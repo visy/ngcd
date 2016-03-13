@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <chardata>
   <setup>
     <starting_tile>256</starting_tile>
@@ -55,6 +55,12 @@
 <frame>92,0:2,4</frame>
 <frame>94,0:2,4</frame>
 </sprt>
+  <scrl id="end">
+  	<file>gfx\end.png</file>
+  </scrl>
+  <pict id="endtext">
+  	<file>gfx\endtext.png</file>
+  </pict>
 
   <scrl id="fourk">
  	<file>gfx\4k.png</file>
@@ -65,9 +71,6 @@
   </scrl>
   <scrl id="sakura">
  	<file>gfx\sakura.png</file>
-  </scrl>
-  <scrl id="sakura2">
- 	<file>gfx\sakura2.png</file>
   </scrl>
 
   <pict id="cursor">
