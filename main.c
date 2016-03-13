@@ -717,6 +717,17 @@ void demopart_phone() {
 
 		if (t>800) break;
 
+			if (t >= 600) {
+				volMEMWORD(0x400000)=0x8000; // black
+				volMEMWORD(0x400002)=0xf89F +(t3/1); // black
+				volMEMWORD(0x400004)=(0xa5fe +(t3/1)); // black
+				volMEMWORD(0x400006)=0xb5fE +(t3/1); // black
+				volMEMWORD(0x400008)=0xa4fE +(t3/1);  // black
+			}
+
+			if (t3 >= 500)
+			fade_in();
+
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
 
 		p1=volMEMBYTE(P1_CURRENT);
@@ -748,13 +759,6 @@ void demopart_phone() {
 		millis = t3/(2); 
 		t = millis;
 			
-			if (t >= 600) {
-				volMEMWORD(0x400000)=0x8000; // black
-				volMEMWORD(0x400002)=0xf89F +(t3/1); // black
-				volMEMWORD(0x400004)=(0xa5fe +(t3/1)); // black
-				volMEMWORD(0x400006)=0xb5fE +(t3/1); // black
-				volMEMWORD(0x400008)=0xa4fE +(t3/1);  // black
-			}
 			if (t >= 600 && t < 800 && ml < 15) { 
 				backgroundColor(0xffff);
 
