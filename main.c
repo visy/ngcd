@@ -1813,7 +1813,7 @@ void demopart_4k() {
 	short way1=JOY_UP,way2=JOY_UP;
 	short visible=true;
 	WORD raster=true;
-	WORD tableShift=0;
+	WORD tableShift=52;
 	short ss = 0;
 	ushort rasterData0[512];
 	ushort rasterData1[512];
@@ -1935,6 +1935,7 @@ void startDemologic() {
 	asm("clr.w %d0");
 	asm("move.w #0x0502,%d0");
 	asm("jsr 0xC0056A");
+	demopart_4k();
 
 	trastyle = 1;
 	demopart_letter();
