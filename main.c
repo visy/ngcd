@@ -333,14 +333,7 @@ void draw_transition() {
 		if (trastart == 0) trastart = DAT_frameCounter;
 
 		if (t >= firstframe && t <= targetframe && traframe == 0)  {
-			traframe++;
-			traframea = traframe;
-			if (tradir == 1) traframea = 16-traframe;
-			act = traframea+(224*trastyle);
-			for (y = 0;y<30;y++) {
-					fixPrintf(0,y,0,0,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act);
-			}
-			targetframe = t + 1;
+			if (traframe == 0 && tradir == 0) clearFixLayer();
 			if (trafont == 0) {
 				trafont = 1;
 				volMEMWORD(0x400000)=tracolor; // black
@@ -350,6 +343,15 @@ void draw_transition() {
 				volMEMWORD(0x400008)=tracolor; // black
 				volMEMWORD(0x40000a)=tracolor; // black
 			}
+
+			traframe++;
+			traframea = traframe;
+			if (tradir == 1) traframea = 16-traframe;
+			act = traframea+(224*trastyle);
+			for (y = 0;y<30;y++) {
+					fixPrintf(0,y,0,0,"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act,act);
+			}
+			targetframe = t + 1;
 		}
 		else if (t >= targetframe && traframe > 0)  {
 			trafont = 0;
@@ -445,7 +447,6 @@ else {
 
 	clearFixLayer();
 	initGfx();
-	jobMeterSetup(true);
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
@@ -488,7 +489,6 @@ else {
 		// BIOSF_SYSTEM_IO
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-		jobMeterColor(JOB_PURPLE);
 
 		p1=volMEMBYTE(P1_CURRENT);
 		p2=volMEMBYTE(P2_CURRENT);
@@ -558,9 +558,6 @@ else {
 		backX=(((x-8)*141)/299)+BACK_MIN_X;
 		backY=(((y-16)*3)/8)+BACK_MIN_Y;
 
-			
-		jobMeterColor(JOB_BLUE);
-
 		scrollerSetPos(&frontScroll, sintab[t*5 % 1023]>>3, -2-ly/7);
 		scrollerSetPos(&backScroll, backX, backY);
 		scrollerSetPos(&letterScroll, lx+8, ly);
@@ -601,7 +598,6 @@ else {
 		tableShift++;
 */
 		tableShift++;
-		jobMeterColor(JOB_GREEN);
 
 	}
 
@@ -678,7 +674,6 @@ void demopart_phone() {
 	LSPCmode=0x1c00;	//autoanim speed
 
 	initGfx();
-	jobMeterSetup(true);
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
@@ -722,7 +717,6 @@ void demopart_phone() {
 		if (t>800) break;
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-		jobMeterColor(JOB_PURPLE);
 
 		p1=volMEMBYTE(P1_CURRENT);
 		p2=volMEMBYTE(P2_CURRENT);
@@ -753,7 +747,6 @@ void demopart_phone() {
 		millis = t3/(2); 
 		t = millis;
 			
-		jobMeterColor(JOB_BLUE);
 			if (t >= 600) {
 				volMEMWORD(0x400000)=0x8000; // black
 				volMEMWORD(0x400002)=0xf89F +(t3/1); // black
@@ -837,8 +830,6 @@ void demopart_phone() {
 			draw_transition();
 
 
-		jobMeterColor(JOB_GREEN);
-
 	}
 	SCClose();
 
@@ -900,7 +891,6 @@ void demopart_sakura() {
 
 	clearFixLayer();
 	initGfx();
-	jobMeterSetup(false);
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
@@ -939,8 +929,6 @@ void demopart_sakura() {
 
 		waitVBlank();
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-
-		jobMeterColor(JOB_BLUE);
 
 		if (t > 900) break;
 
@@ -1021,7 +1009,6 @@ void demopart_sakura() {
 
 		millis = t3/(2); 
 		t = millis;
-		jobMeterColor(JOB_GREEN);
 
 	SCClose();
 
@@ -1081,7 +1068,6 @@ void demopart_meta() {
 	LSPCmode=0x1c00;	//autoanim speed
 
 	initGfx();
-	jobMeterSetup(true);
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
@@ -1115,7 +1101,6 @@ void demopart_meta() {
 		}
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-		jobMeterColor(JOB_PURPLE);
 
 		draw_transition();
 
@@ -1147,10 +1132,6 @@ void demopart_meta() {
 		millis = t3/(2); 
 		t = millis;
 			
-		jobMeterColor(JOB_BLUE);
-
-
-
 		newx += scrollx>>5;
 
 
@@ -1176,9 +1157,6 @@ void demopart_meta() {
 		}
 
 		SCClose();
-
-
-		jobMeterColor(JOB_GREEN);
 
 	}
 
@@ -1234,7 +1212,6 @@ void demopart_kiss() {
 	clearFixLayer();
 
 	initGfx();
-	jobMeterSetup(false);
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
@@ -1268,7 +1245,6 @@ void demopart_kiss() {
 		if (t>1840) break;
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-		jobMeterColor(JOB_PURPLE);
 
 		p1=volMEMBYTE(P1_CURRENT);
 		p2=volMEMBYTE(P2_CURRENT);
@@ -1309,8 +1285,6 @@ void demopart_kiss() {
 
 		millis = t3/(2); 
 		t = millis;
-			
-		jobMeterColor(JOB_BLUE);
 
 		for (i = 0; i < 10; i++) {
 
@@ -1322,9 +1296,6 @@ void demopart_kiss() {
 
 		SCClose();
 
-
-
-		jobMeterColor(JOB_GREEN);
 
 	}
 
@@ -1527,7 +1498,6 @@ void demopart_sprite() {
 	short visible=true;
 
 	initGfx();
-	jobMeterSetup(true);
 
 	for (i = 0; i < 6*6; i++) {
 		x = 0;
@@ -1580,11 +1550,9 @@ void demopart_sprite() {
 		if(p1&JOY_RIGHT)	x++;
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-		jobMeterColor(JOB_BLUE);
 
 		//while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
 //		sortSprites(&drawTable[1],sortSize);
-		jobMeterColor(JOB_PINK);
 
 		for (i = 0; i < 6*6; i++) {
 			aSpriteSetPos(&sprites[i],30+(((sintab[i*1+t&1023]+sintab[i*1+t&1023]))%15 * 21), i*2+(21+(sintab[i*4+(t+256)&1023]))-100);
@@ -1664,7 +1632,6 @@ void demopart_letter2() {
 
 	clearFixLayer();
 	initGfx();
-	jobMeterSetup(true);
 
 	loadTIirq(TI_MODE_SINGLE_DATA);
 
@@ -1707,7 +1674,6 @@ void demopart_letter2() {
 		// BIOSF_SYSTEM_IO
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-		jobMeterColor(JOB_PURPLE);
 
 		p1=volMEMBYTE(P1_CURRENT);
 		p2=volMEMBYTE(P2_CURRENT);
@@ -1777,9 +1743,6 @@ void demopart_letter2() {
 		backX=(((x-8)*141)/299)+BACK_MIN_X;
 		backY=(((y-16)*3)/8)+BACK_MIN_Y;
 
-			
-		jobMeterColor(JOB_BLUE);
-
 		scrollerSetPos(&backScroll, 0, 0);
 		scrollerSetPos(&letterScroll, lx+8, ly);
 
@@ -1819,7 +1782,6 @@ void demopart_letter2() {
 		tableShift++;
 */
 		tableShift++;
-		jobMeterColor(JOB_GREEN);
 
 	}
 
@@ -1846,7 +1808,6 @@ void demopart_4k() {
 	short visible=true;
 
 	initGfx();
-	jobMeterSetup(true);
 
 	scrollerInit(&frontScroll, &fourk, 1, 32, 0, 0);
 	palJobPut(32, fourk_Palettes.palCount, fourk_Palettes.data);
@@ -1878,11 +1839,9 @@ void demopart_4k() {
 		if(p1&JOY_RIGHT)	x++;
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
-		jobMeterColor(JOB_BLUE);
 
 		//while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
 //		sortSprites(&drawTable[1],sortSize);
-		jobMeterColor(JOB_PINK);
 
 
 		t3 = DAT_frameCounter-startframe;
