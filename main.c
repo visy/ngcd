@@ -1935,7 +1935,6 @@ void startDemologic() {
 	asm("clr.w %d0");
 	asm("move.w #0x0502,%d0");
 	asm("jsr 0xC0056A");
-	demopart_4k();
 
 	trastyle = 1;
 	demopart_letter();
