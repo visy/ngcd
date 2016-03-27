@@ -91,9 +91,6 @@ void fade_out()
 
 	while(1)
 	{
-		waitVBlank();
-
-
 		steps-=1;
 
 		for(i=0; i<256; i++)
@@ -146,6 +143,7 @@ void fade_out()
 			color[i].new_color=(color[i].index_temp)*4096+(color[i].red_temp)*256+(color[i].green_temp)*16+(color[i].blue_temp);
 			volMEMWORD(4194304+(i*2)+(palette_no*32)) = color[i].new_color;
 		}
+		waitVBlank();
 		backgroundColor(color[2].new_color);
 		SCClose();
 		if(steps<=-64) break; // exit loop when done
@@ -725,8 +723,9 @@ void demopart_phone() {
 				volMEMWORD(0x400008)=0xa4fE +(t3/1);  // black
 			}
 
-			if (t3 >= 500)
+		if (t3>=500 && t<800) {
 			fade_in();
+		}
 
 		while((volMEMWORD(0x3c0006)>>7)!=0x120); //wait raster line 16
 
@@ -797,8 +796,6 @@ void demopart_phone() {
 
 
 		if (t3>=500 && t<800) {
-
-			fade_in();
 
 			if (t3 > 550) {
 				if (blinkcnt == 32) pictureHide(&cursorPic); 
@@ -1113,13 +1110,6 @@ void demopart_meta() {
 		p2=volMEMBYTE(P2_CURRENT);
 		ps=volMEMBYTE(PS_CURRENT);
 		
-		if((ps&P1_START)&&(ps&P2_START)) {
-			clearSprites(1, 42+ffbg_c.tileWidth);
-			SCClose();
-			waitVBlank();
-			return;
-		}
-
 		if(p1&JOY_UP)	scrolly--;
 		if(p1&JOY_DOWN)	scrolly++;
 //		if(p1&JOY_LEFT)	scrollx--;
