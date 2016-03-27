@@ -54,7 +54,7 @@ DEBUG = -g
 ##################
 # FIX Definition #
 ##################
-FIXFILES = $(BASEDIR)/src/shared/fix_font.bmp
+FIXFILES = gfx/fix_font.bmp
 
 ##############
 # Make rules #
@@ -113,6 +113,7 @@ convert:
 cdiso:
 	del test.iso
 	..\..\bin\mkisofs -o test.iso .\output\cd
+	copy test.iso .\output\image\image.iso
 
 cdzip:
 	del .\output\emu\demo.zip
@@ -124,7 +125,7 @@ runr:
 	..\..\..\raine\raine32 output\emu\demo.zip
 
 run:
-	c:\emu\mame\mame neocdz -cdrom output\image\image.cue -window -skip_gameinfo 
+	c:\emu\mame\mame neocdz -cdrom output\image\image.cue -window -skip_gameinfo -waitvsync
 
 ############
 # FIX Rule #
