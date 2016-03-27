@@ -1,4 +1,6 @@
 //scrollers
+extern scrollerInfo end;
+extern paletteInfo end_Palettes;
 extern scrollerInfo fourk;
 extern paletteInfo fourk_Palettes;
 extern scrollerInfo isobg;
@@ -7,6 +9,8 @@ extern scrollerInfo sakura;
 extern paletteInfo sakura_Palettes;
 extern scrollerInfo title;
 extern paletteInfo title_Palettes;
+extern scrollerInfo emugeo;
+extern paletteInfo emugeo_Palettes;
 extern scrollerInfo map;
 extern paletteInfo map_Palettes;
 extern scrollerInfo meta;
@@ -49,6 +53,8 @@ extern scrollerInfo ttbg_c;
 extern paletteInfo ttbg_c_Palettes;
 
 //pictures
+extern pictureInfo endtext;
+extern paletteInfo endtext_Palettes;
 extern pictureInfo cursor;
 extern paletteInfo cursor_Palettes;
 extern pictureInfo ffbg_c;
