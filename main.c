@@ -47,7 +47,7 @@ void clearFixLayerBars() {
 
 void fade_out()
 {
-	int palette_no = 1; // first palette to start with
+	int palette_no = 0; // first palette to start with
 	int i;
 	int steps=0;
 
@@ -153,6 +153,13 @@ void fade_out()
 
 			color[i].new_color=(color[i].index_temp)*4096+(color[i].red_temp)*256+(color[i].green_temp)*16+(color[i].blue_temp);
 			volMEMWORD(4194304+(i*2)+(palette_no*32)) = color[i].new_color;
+				volMEMWORD(0x400000+0)=0; // black
+				volMEMWORD(0x400002+0)=0; // black
+				volMEMWORD(0x400004+0)=0; // black
+				volMEMWORD(0x400006+0)=0; // black
+				volMEMWORD(0x400008+0)=0; // black
+				volMEMWORD(0x40000a+0)=0; // black
+
 		}
 		waitVBlank();
 		backgroundColor(color[2].new_color);
