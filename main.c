@@ -47,7 +47,7 @@ void clearFixLayerBars() {
 
 void fade_out()
 {
-	int palette_no = 0; // first palette to start with
+	int palette_no = 1; // first palette to start with
 	int i;
 	int steps=0;
 
